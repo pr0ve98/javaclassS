@@ -9,8 +9,8 @@
 	
 	
 	
-	<insert id="setUserInputOk" parameterType="userVO">
-		insert into user values (default, #{vo.mid}, #{vo.name}, #{vo.age}, #{vo.address});
+	<insert id="setUserInputOk" parameterType="vo">
+		insert into user values (default, #{mid}, #{name}, #{age}, #{address});
 	</insert>
 	
 	
