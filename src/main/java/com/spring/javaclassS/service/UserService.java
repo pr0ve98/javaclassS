@@ -16,4 +16,6 @@ public interface UserService {
 
 	public int setUserUpdateOk(UserVO vo);
 
+	public UserVO getUserNameSearch(String name);
+
 }

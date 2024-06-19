@@ -38,4 +38,9 @@ public class UserServiceImpl implements UserService {
 	public int setUserUpdateOk(UserVO vo) {
 		return userDAO.setUserUpdateOk(vo);
 	}
+
+	@Override
+	public UserVO getUserNameSearch(String name) {
+		return userDAO.getUserNameSearch(name);
+	}
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.spring.javaclassS.service.StudyService;
 import com.spring.javaclassS.service.UserService;
+import com.spring.javaclassS.vo.UserVO;
 
 @Controller
 @RequestMapping("/study")
@@ -85,18 +86,16 @@ public class StudyController {
 	
 	@RequestMapping(value = "/ajax/ajaxTest4", method = RequestMethod.GET)
 	public String ajaxTest4Get(Model model) {
-		
-		return "study/ajax/ajaxTest3_3";
+		String[] names = studyService.getUserNames();
+		model.addAttribute("names", names);
+		return "study/ajax/ajaxTest4";
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/ajax/ajaxTest4", method = RequestMethod.POST)
-	public HashMap<Object, Object> ajaxTest4Post(String dodo) {
-		ArrayList<String> vos = studyService.getCityArrayList(dodo);
-		
-		HashMap<Object, Object> map = new HashMap<Object, Object>();
-		map.put("city", vos);
-		
-		return map;
+	@RequestMapping(value = "/ajax/ajaxTest4", method = RequestMethod.POST, produces = "application/text; charset=utf8")
+	public String ajaxTest4Post(String name) {
+		UserVO vo = studyService.getUserNameSearch(name);
+		String str = "선택하신 회원 "+name+"의 정보는 아이디-"+vo.getMid()+", 나이-"+vo.getAge()+", 주소-"+vo.getAddress()+"입니다.";
+		return str;
 	}
 }

@@ -40,4 +40,9 @@ public class UserDAOImpl implements UserDAO {
 		return sqlSession.update("userNS.setUserUpdateOk", vo);
 	}
 
+	@Override
+	public UserVO getUserNameSearch(String name) {
+		return sqlSession.selectOne("userNS.getUserNameSearch", name);
+	}
+
 }

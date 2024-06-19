@@ -1,12 +1,18 @@
 package com.spring.javaclassS.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.spring.javaclassS.vo.UserVO;
 
 @Service
 public class StudyServiceImpl implements StudyService {
+	
+	@Autowired
+	UserService userService;
 
 	@Override
 	public String[] getCityStringArray(String dodo) {
@@ -120,6 +126,24 @@ public class StudyServiceImpl implements StudyService {
 		}
 		
 		return vos;
+	}
+
+	@Override
+	public String[] getUserNames() {
+		String[] userNames = new String[100];
+		List<UserVO> vos = userService.getUserList();
+		int cnt = 0;
+		for(UserVO vo : vos) {
+			userNames[cnt] = vo.getName();
+			cnt++;
+		}
+		return userNames;
+	}
+
+	@Override
+	public UserVO getUserNameSearch(String name) {
+		UserVO vo = userService.getUserNameSearch(name);
+		return vo;
 	}
 
 }

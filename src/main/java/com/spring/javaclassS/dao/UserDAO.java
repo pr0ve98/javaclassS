@@ -16,4 +16,6 @@ public interface UserDAO {
 
 	public int setUserUpdateOk(UserVO vo);
 
+	public UserVO getUserNameSearch(String name);
+
 }

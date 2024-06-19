@@ -5,41 +5,25 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ajaxTest3_3.jsp</title>
+<title>ajaxTest4.jsp</title>
 <jsp:include page="/WEB-INF/views/include/bs4.jsp" />
 <script>
 	'use strict';
 	
 	function fCheck() {
-		let dodo = $("#dodo").val();
-		let city = $("#city").val();
-		
-		if(dodo == "" || city == "도시선택"){
-			alert("지역을 선택후 눌러주세요");
-			return false;
-		}
-		let str = "선택하신 지역은: "+dodo+"/"+city;
-		$("#demo").html(str);
-	}
-	
-	function dodoCheck() {
-		let dodo = document.getElementById("dodo").value;
-		if(dodo.trim() == ""){
-			alert("지역을 선택하세요");
+		let name = document.getElementById("name").value;
+		if(name.trim() == ""){
+			alert("이름을 선택하세요");
 			return false;
 		}
 		
 		$.ajax({
-			url : "${ctp}/study/ajax/ajaxTest3_3",
+			url : "${ctp}/study/ajax/ajaxTest4",
 			type : "post",
-			data : {dodo:dodo},
+			data : {name:name},
 			success : function(res) {
 				//console.log(res);
-  				let str = '<option>도시선택</option>';
-				for(let i=0; i<res.city.length; i++){
-					str += '<option>'+res.city[i]+'</option>';
-				}
-				$("#city").html(str);
+				$("#demo").html(res);
 			},
 			error : function() {
 				alert("전송 오류");
@@ -57,8 +41,13 @@
 	<hr/>
 	<form>
 		<h3>이름을 선택하세요</h3>
-		<select name="name" id="name" onchange="nameCheck()">
+		<select name="name" id="name">
 			<option value="">이름선택</option>	
+			<c:forEach var="name" items="${names}">
+				<c:if test="${name != null}">
+					<option>${name}</option>
+				</c:if>
+			</c:forEach>
 		</select>
 		<input type="button" value="선택" onclick="fCheck()" class="btn btn-info mr-3 mb-3" />
 		<input type="button" value="돌아가기" onclick="location.href='ajaxForm';" class="btn btn-warning mr-3 mb-3" />
