@@ -28,4 +28,14 @@ public class UserServiceImpl implements UserService {
 	public int setUserInputOk(UserVO vo) {
 		return userDAO.setUserInputOk(vo);
 	}
+
+	@Override
+	public List<UserVO> getUserIdSearch(String mid) {
+		return userDAO.getUserIdSearch(mid);
+	}
+
+	@Override
+	public int setUserUpdateOk(UserVO vo) {
+		return userDAO.setUserUpdateOk(vo);
+	}
 }

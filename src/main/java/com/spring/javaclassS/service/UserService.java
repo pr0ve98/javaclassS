@@ -12,4 +12,8 @@ public interface UserService {
 
 	public int setUserInputOk(UserVO vo);
 
+	public List<UserVO> getUserIdSearch(String mid);
+
+	public int setUserUpdateOk(UserVO vo);
+
 }

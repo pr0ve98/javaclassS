@@ -5,7 +5,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>userList.jsp(조회,입력,삭제,수정)</title>
+  <title>dbtestList.jsp</title>
   <jsp:include page="/WEB-INF/views/include/bs4.jsp" />
   <style>
     th {
@@ -37,7 +37,7 @@
     	let ans = confirm("선택하신 회원을 삭제처리 하시겠습니까?");
     	if(!ans) return false;
     	
-    	location.href = "${ctp}/user/userDelete?idx="+idx;
+    	location.href = "${ctp}/dbtest/dbtestDelete?idx="+idx;
     }
     
     function idSearch() {
@@ -46,7 +46,7 @@
     		alert("검색할 아이디를 입력하세요");
     		return false;
     	}
-    	location.href = "${ctp}/user/userSearch/"+mid;
+    	location.href = "${ctp}/dbtest/dbtestSearch/"+mid;
     }
     
     function updateCheck(idx) {
@@ -54,6 +54,13 @@
     	$("#updateBtn"+idx).hide();
     	$("#row"+idx).show();
     }
+    
+    function idCheck() {
+		let mid = myform.mid.value.trim();
+		let url = "${ctp}/dbtest/dbtestWindow?mid="+mid;
+		
+		window.open(url, "dbtestWindow", "width=500px,height=250px");
+	}
   </script>
 </head>
 <body>
@@ -68,11 +75,18 @@
 	  <input type="button" value="회원가입창가리기" id="btnHide" class="btn btn-primary" />
   </div>
   <div id="userInput">
-    <form name="myform" method="post" action="${ctp}/user/userInputOk">
+    <form name="myform" method="post" action="${ctp}/dbtest/dbtestInputOk">
       <table class="table table-bordered text-center">
         <tr>
           <th>아이디</th>
-          <td><input type="text" name="mid" value="atom1234" class="form-control" /></td>
+          <td>
+          	<div class="input-group">
+          		<input type="text" name="mid" value="atom1234" class="form-control" />
+          		<div class="input-group-append">
+          			<input type="button" value="아이디중복체크" onclick="idCheck()" class="btn btn-success" />
+          		</div>
+          	</div>
+          </td>
         </tr>
         <tr>
           <th>성명</th>
@@ -117,7 +131,7 @@
         </td>
       </tr>
       <tr class="userRow" id="row${vo.idx}" style="display:none">
-	      <form name="myform${vo.idx}" method="post" action="${ctp}/user/userUpdateOk">
+	      <form name="myform${vo.idx}" method="post" action="${ctp}/dbtest/dbtestUpdateOk">
 	        <td>${vo.idx}</td>
 	        <td><input type="text" name="mid" value="${vo.mid}" id="mid${vo.idx}" class="form-control"></td>
 	        <td><input type="text" name="name" value="${vo.name}" id="name${vo.name}" class="form-control"></td>
@@ -164,7 +178,7 @@
 	    <tr><td colspan="6" class="m-0 p-0"></td></tr>
 	  </table>
     <div class="text-right">
-      <input type="button" value="결과닫기" onclick="location.href='userList';" class="btn btn-success"/>
+      <input type="button" value="결과닫기" onclick="location.href='${ctp}/dbtest/dbtestList';" class="btn btn-success"/>
     </div>
   </c:if>
 </div>
