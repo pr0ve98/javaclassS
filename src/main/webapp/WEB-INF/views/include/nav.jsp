@@ -16,6 +16,7 @@
 	        <a href="${ctp}/user/userList" class="w3-bar-item w3-button">UserList</a>
 	        <a href="${ctp}/dbtest/dbtestList" class="w3-bar-item w3-button">DB Test</a>
 	        <a href="${ctp}/study/ajax/ajaxForm" class="w3-bar-item w3-button">Ajax</a>
+	        <a href="${ctp}/study/restapi/restapi" class="w3-bar-item w3-button">REST API</a>
 	        <a href="${ctp}/password/password" class="w3-bar-item w3-button">암호화</a>
 	      </div>
 	    </div>
