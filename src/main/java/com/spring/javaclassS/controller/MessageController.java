@@ -92,6 +92,34 @@ public class MessageController {
 			model.addAttribute("msg", "회원가입 실패...");
 			model.addAttribute("url", "/member/memberJoin");
 		}
+		else if(msgFlag.equals("memberLoginOk")) {
+			model.addAttribute("msg", mid+"님 로그인 되었습니다!");
+			model.addAttribute("url", "/member/memberMain");
+		}
+		else if(msgFlag.equals("memberLoginNo")) {
+			model.addAttribute("msg", "로그인 실패...");
+			model.addAttribute("url", "/member/memberLogin");
+		}
+		else if(msgFlag.equals("memberLogout")) {
+			model.addAttribute("msg", mid+"님 로그아웃 되었습니다!");
+			model.addAttribute("url", "/member/memberLogin");
+		}
+		else if(msgFlag.equals("fileUploadOk")) {
+			model.addAttribute("msg","파일이 업로드 되었습니다!");
+			model.addAttribute("url", "/study/fileUpload/fileUpload");
+		}
+		else if(msgFlag.equals("fileUploadNo")) {
+			model.addAttribute("msg","파일 업로드 실패~");
+			model.addAttribute("url", "/study/fileUpload/fileUpload");
+		}
+		else if(msgFlag.equals("memberUpdateOk")) {
+			model.addAttribute("msg","정보 수정 완료!");
+			model.addAttribute("url", "/member/memberMain");
+		}
+		else if(msgFlag.equals("memberUpdateNo")) {
+			model.addAttribute("msg","정보 수정 실패~");
+			model.addAttribute("url", "/member/memberPwdCheck/i");
+		}
 		
 
 		

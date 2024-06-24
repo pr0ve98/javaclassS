@@ -1,10 +1,18 @@
 package com.spring.javaclassS.service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javaclassS.dao.StudyDAO;
 import com.spring.javaclassS.dao.UserDAO;
@@ -250,6 +258,42 @@ public class StudyServiceImpl implements StudyService {
 		}
 		str += "</table>";
 		return str;
+	}
+
+	@Override
+	public int fileUpload(MultipartFile fName, String mid) {
+		int res = 0;
+		
+		// 파일 이름 중복처리를 위해 UUID객체 활용
+		UUID uid = UUID.randomUUID();
+		String oFileName = fName.getOriginalFilename();
+		String sFileName = mid + "_" + uid.toString().substring(0,8) + "_" + oFileName;
+		
+		// 서버에 파일 올리기
+		try {
+			wirteFile(fName, sFileName);
+			res = 1;
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return res;
+	}
+
+	private void wirteFile(MultipartFile fName, String sFileName) throws IOException {
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/fileUpload/");
+		
+		FileOutputStream fos = new FileOutputStream(realPath + sFileName);
+		
+		//fos.write(fName.getBytes()); 용량이 크면 문제가 생길 수 있음
+		if(fName.getBytes().length != -1) {
+			fos.write(fName.getBytes());
+		}
+		fos.flush();
+		fos.close();
 	}
 
 

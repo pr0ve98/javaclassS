@@ -15,7 +15,7 @@
 			$("#pwdDemo").hide();
 		});
 		
-		function pwdReCheck() {
+		function pwdCheck() {
 			let pwd = $("#pwd").val().trim();
 			
 			if(pwd == ""){
@@ -25,12 +25,21 @@
 			}
 			
 			$.ajax({
-				url : "MemberPwdCheckAjax.mem",
+				url : "${ctp}/member/memberPwdCheck",
 				type : "post",
-				data : {pwd : pwd},
+				data : {pwd : pwd, mid : '${sMid}'},
 				success : function(res) {
-					if(res != 0) $("#pwdDemo").show();
-					else alert("비밀번호가 틀립니다. 다시 입력하세요.");
+					if(res != 0) {
+						if('${pwdFlag}' == 'p'){
+							$("#pwdDemo").show();
+							$("#pwdForm").hide();
+						}
+						else location.href = '${ctp}/member/memberUpdate?mid=${sMid}';
+					}
+					else {
+						alert("비밀번호가 틀립니다. 다시 입력하세요.");
+						$("#pwd").focus();
+					}
 				},
 				error : function() {
 					alert("오류남");
@@ -52,9 +61,21 @@
 				$("pwdCheck").focus();
 				return false;
 			}
-			else {
-				pwdForm.submit();
-			}
+			
+			$.ajax({
+				url : "${ctp}/member/memberPwdChangeOk",
+				type : "post",
+				data : {mid : '${sMid}', pwd : pwdCheck},
+				success : function(res) {
+					if(res != "0") {
+						alert("비밀번호가 변경되었습니다.\n다시 로그인해주세요!");
+						location.href = "${ctp}/member/memberLogout";
+					}
+				},
+				error : function() {
+					alert("전송오류!");
+				}
+			});
 			
 		}
 	</script>
@@ -64,7 +85,7 @@
 <jsp:include page="/WEB-INF/views/include/slide2.jsp" />
 <p><br/></p>
 <div class="container">
-	<form name="myform" method="post" action="MemberPwdCheckOk.mem">
+	<form name="myform" id="pwdForm" method="post">
 		<table class="table table-bordered text-center">
 			<tr>
 				<td colspan="2">
@@ -78,18 +99,22 @@
 			</tr>
 			<tr>
 				<td colspan="2" class="text-center">
-					<input type="button" value="비밀번호 변경" onclick="pwdReCheck()" class="btn btn-success mr-2" />
-					<input type="submit" value="회원정보 변경" class="btn btn-primary mr-2" />
+					<input type="button" value="비밀번호 확인" onclick="pwdCheck()" class="btn btn-success mr-2" />
 					<input type="reset" value="다시입력" class="btn btn-warning mr-2" />
-					<input type="button" value="돌아가기" onclick="location.href='MemberMain.mem';" class="btn btn-danger mr-2" />
+					<input type="button" value="돌아가기" onclick="location.href='${ctp}/member/memberMain';" class="btn btn-danger mr-2" />
 				</td>
 			</tr>
 		</table>
 		<br/>
 	</form>
 	<div id="pwdDemo">
-		<form name="pwdForm" method="post" action="MemberPwdChangeCheck.mem">
-			<table>
+		<form name="pwdForm" method="post">
+			<table class="table table-bordered">
+		        <tr>
+		          <td colspan="2" class="text-center">
+		            <h4>비밀번호 변경</h4>
+		          </td>
+		        </tr>
 				<tr>
 					<td>변경할 비밀번호를 입력하세요</td>
 					<td><input type="password" name="pwdCheck" id="pwdCheck" class="form-control" required /></td>
@@ -100,7 +125,9 @@
 				</tr>
 				<tr>
 					<td colspan="2" class="text-center">
-						<input type="button" value="비밀번호 변경하기" onclick="pwdChangeCheck()" class="btn btn-secondary" />
+						<input type="button" value="비밀번호 변경하기" onclick="pwdChangeCheck()" class="btn btn-secondary mr-2" />
+						<input type="reset" value="다시입력" class="btn btn-warning mr-2" />
+						<input type="button" value="돌아가기" onclick="location.href='${ctp}/member/memberMain';" class="btn btn-danger mr-2" />
 					</td>
 				</tr>
 			</table>

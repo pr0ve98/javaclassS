@@ -1,10 +1,16 @@
 package com.spring.javaclassS.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -12,11 +18,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javaclassS.service.MemberService;
 import com.spring.javaclassS.vo.MemberVO;
@@ -35,8 +45,101 @@ public class MemberController {
 	JavaMailSender mailSender;
 	
 	@RequestMapping(value = "/memberLogin", method = RequestMethod.GET)
-	public String memberLoginGet() {
+	public String memberLoginGet(HttpServletRequest request) {
+	    Cookie[] cookies = request.getCookies();
+	    String saveMid = "";
+	    String check = "";
+	    if(cookies != null) {
+		    for(int i=0; i<cookies.length; i++) {
+		        if(cookies[i].getName().equals("cMid")) {
+		        	saveMid = cookies[i].getValue();
+		        	check = "checked";
+		        	break;
+		        }
+		    }
+	    }
+	    request.setAttribute("saveMid", saveMid);
+	    request.setAttribute("check", check);
 		return "member/memberLogin";
+	}
+	
+	@RequestMapping(value = "/memberLogin", method = RequestMethod.POST)
+	public String memberLoginPost(HttpServletRequest request, HttpServletResponse response, HttpSession session,
+			@RequestParam(name="mid", defaultValue = "hkd1234", required = false) String mid,
+			@RequestParam(name="pwd", defaultValue = "qwer1234!", required = false) String pwd,
+			@RequestParam(name="idSave", defaultValue = "", required = false) String idSave) {
+		
+		// 로그인 인증처리(스프링 시큐리티의 BCryptPasswordEncoder객체를 이용한 암호화되어 있는 비밀번호 비교하기)
+		MemberVO vo = memberService.getMemberIdCheck(mid);
+		
+		if(vo != null && vo.getUserDel().equals("NO") && passwordEncoder.matches(pwd, vo.getPwd())) {
+			// 1. 세션처리
+			String strLevel = "";
+			if(vo.getLevel() == 0) strLevel = "관리자";
+			else if(vo.getLevel() == 1) strLevel = "우수회원";
+			else if(vo.getLevel() == 2) strLevel = "정회원";
+			else if(vo.getLevel() == 3) strLevel = "준회원";
+			
+			session.setAttribute("sMid", mid);
+			session.setAttribute("sNickName", vo.getNickName());
+			session.setAttribute("sLevel", vo.getLevel());
+			session.setAttribute("strLevel", strLevel);
+			
+			// 2. 쿠키 저장/삭제
+			if(idSave.equals("저장")) {
+				Cookie cookieMid = new Cookie("cMid", mid);
+				cookieMid.setPath("/"); // 쿠키 경로 지정
+				cookieMid.setMaxAge(60*60*24*7); // 쿠키의 만료시간 일주일
+				response.addCookie(cookieMid);
+			}
+			else {
+			    Cookie[] cookies = request.getCookies();
+			    if(cookies != null) {
+			    	for(int i=0; i<cookies.length; i++) {
+			    		if(cookies[i].getName().equals("cMid")) {
+			    			cookies[i].setMaxAge(0);
+			    			response.addCookie(cookies[i]);
+			    			break;
+			    		}
+			    	}
+			    }
+			}
+			
+			// 3. 기타처리(DB에 처리해야할것들(방문카운트, 포인트, ...등)
+			// 방문포인트 / 방문카운트 (1회 방문시 10p, 일일 최대 50p)
+			// 숙제
+			Date today = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String strToday = sdf.format(today);
+			
+			if(!strToday.equals(vo.getLastDate().substring(0, 10))) {
+				vo.setTodayCnt(1);
+				vo.setPoint(vo.getPoint()+10);
+			}
+			else {
+				vo.setTodayCnt(vo.getTodayCnt()+1);
+				if(vo.getTodayCnt() <= 5) vo.setPoint(vo.getPoint()+10);
+			}
+			memberService.setMemberInforUpdate(vo);
+			
+			return "redirect:/message/memberLoginOk?mid="+mid;
+		}
+		else return "redirect:/message/memberLoginNo";
+	}
+	
+	@RequestMapping(value = "/memberLogout", method = RequestMethod.GET)
+	public String memberLogoutGet(HttpSession session) {
+		String mid = (String) session.getAttribute("sMid");
+		session.invalidate();
+		return "redirect:/message/memberLogout?mid="+mid;
+	}
+	
+	@RequestMapping(value = "/memberMain", method = RequestMethod.GET)
+	public String memberMainGet(HttpSession session, Model model) {
+		String mid = (String) session.getAttribute("sMid");
+		MemberVO mVo = memberService.getMemberIdCheck(mid);
+		model.addAttribute("mVo", mVo);
+		return "member/memberMain";
 	}
 	
 	@RequestMapping(value = "/memberJoin", method = RequestMethod.GET)
@@ -45,7 +148,7 @@ public class MemberController {
 	}
 	
 	@RequestMapping(value = "/memberJoin", method = RequestMethod.POST)
-	public String memberLoginPost(MemberVO vo) {
+	public String memberJoinPost(MemberVO vo, MultipartFile fName) {
 		// 아이디/닉네임 중복체크
 		if(memberService.getMemberIdCheck(vo.getMid()) != null) return "redirect:/message/idCheckNo";
 		if(memberService.getMemberNickCheck(vo.getNickName()) != null) return "redirect:/message/nickCheckNo";
@@ -54,8 +157,7 @@ public class MemberController {
 		vo.setPwd(passwordEncoder.encode(vo.getPwd()));
 		
 		// 회원 사진 처리(service 객체에서 처리후 DB에 저장한다)
-		
-		int res = memberService.setMemberJoinOk(vo);
+		int res = memberService.setMemberJoinOk(vo, fName);
 		
 		if(res != 0) return "redirect:/message/memberJoinOk";
 		else return "redirect:/message/memberJoinNo";
@@ -79,7 +181,7 @@ public class MemberController {
 	
 	@ResponseBody
 	@RequestMapping(value = "/memberNewPassword", method = RequestMethod.POST)
-	public String memberNewPasswordPost(String mid, String email) throws MessagingException {
+	public String memberNewPasswordPost(String mid, String email, HttpSession session) throws MessagingException {
 		MemberVO vo = memberService.getMemberIdCheck(mid);
 		if(vo != null && vo.getEmail().equals(email)) {
 			// 정보확인후 정보가 맞으면 임시비밀번호를 발급받아서 메일로 전송처리한다.
@@ -93,6 +195,10 @@ public class MemberController {
 			String title = "임시비밀번호 메일";
 			String mailFlag = "임시 비밀번호: "+pwd;
 			String res = mailSend(email, title, mailFlag);
+			
+			// 새 비밀번호를 발급하였을시에 sLogin이란 세션을 발생시키고, 2분안에 새 비밀번호로 로그인후 비밀번호를 변경처리할수 있도록 처리
+			// 숙제
+			session.setAttribute("sLogin", "OK");
 			
 			if(res == "1") return "1";
 		}
@@ -133,5 +239,56 @@ public class MemberController {
 		mailSender.send(message);
 		
 		return "1";
+	}
+	
+	@RequestMapping(value = "/memberPwdCheck/{pwdFlag}", method = RequestMethod.GET)
+	public String memberPwdCheckGet(@PathVariable String pwdFlag, Model model) {
+		model.addAttribute("pwdFlag", pwdFlag);
+		return "member/memberPwdCheck";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/memberPwdCheck", method = RequestMethod.POST)
+	public String memberPwdCheckPost(String mid, String pwd) {
+		MemberVO vo = memberService.getMemberIdCheck(mid);
+		if(passwordEncoder.matches(pwd, vo.getPwd())) return "1";
+		else return "0";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/memberPwdChangeOk", method = RequestMethod.POST)
+	public String memberPwdChangeOkPost(String mid, String pwd) {
+		return memberService.setPwdChangeOk(mid, passwordEncoder.encode(pwd))+"";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/memberPhotoChange", method = RequestMethod.POST)
+	public String memberPhotoChangePost(String mid, MultipartFile fName, HttpServletRequest request) {
+		return memberService.setMemberPhotoChange(mid, fName, request)+"";
+	}
+	
+	@RequestMapping(value = "/memberList", method = RequestMethod.GET)
+	public String memberListGet(Model model, HttpSession session) {
+		int level = (int)session.getAttribute("sLevel");
+		ArrayList<MemberVO> vos = memberService.getMemberList(level);
+		model.addAttribute("vos", vos);
+		return "member/memberList";
+	}
+	
+	@RequestMapping(value = "/memberUpdate", method = RequestMethod.GET)
+	public String memberUpdateGet(Model model, String mid) {
+		MemberVO vo = memberService.getMemberIdCheck(mid);
+		model.addAttribute("vo", vo);
+		return "member/memberUpdate";
+	}
+	
+	@RequestMapping(value = "/memberUpdate", method = RequestMethod.POST)
+	public String memberUpdatePost(MemberVO vo, MultipartFile fName, HttpServletRequest request, HttpSession session) {
+		int res = memberService.setMemberUpdate(vo, fName, request);
+		if(res != 0) {
+			session.setAttribute("sNickName", vo.getNickName());
+			return "redirect:/message/memberUpdateOk";
+		}
+		else return "redirect:/message/memberUpdateNo";
 	}
 }

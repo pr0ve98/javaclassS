@@ -2,6 +2,8 @@ package com.spring.javaclassS.service;
 
 import java.util.ArrayList;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.spring.javaclassS.vo.CrimeVO;
 import com.spring.javaclassS.vo.UserVO;
 
@@ -30,6 +32,8 @@ public interface StudyService {
 	public String getYearPoliceCheck(String police, int year, String sort);
 
 	public String getAllCntVo();
+
+	public int fileUpload(MultipartFile fName, String mid);
 
 
 }

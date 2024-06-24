@@ -37,7 +37,8 @@
 		<input type="checkbox" name="userInfor" id="userInfor" onclick="userCheck()" /> 비공개회원만 보기
 	</c:if>
 	<div id="totalList">
-		<h3 class="text-center">전체 회원 리스트</h3>
+		<c:set var="vosCnt" value="${fn:length(vos)}" /> 
+		<h3 class="text-center">전체 회원 리스트(총 ${vosCnt}건)</h3>
 		<table class="table table-hover text-center">
 			<tr class="table-dark text-dark">
 				<th>번호</th>
@@ -57,7 +58,7 @@
 					<c:if test="${vo.userDel == 'OK'}"><c:set var="active" value="탈퇴신청"/></c:if>
 					<c:if test="${vo.userDel != 'OK'}"><c:set var="active" value="활동중"/></c:if>
 					<tr>
-						<td>${vo.idx}</td>
+						<td>${st.count}</td>
 						<c:if test="${sLevel == 0}"><td><a href="MemberSearch.mem?mid=${vo.mid}">${vo.mid}</a></td></c:if>
 						<c:if test="${sLevel != 0}"><td>${vo.mid}</td></c:if>
 						<td>${vo.nickName}</td>

@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="ctp" value="${pageContext.request.contextPath}"/>
 <%
-    Cookie[] cookies = request.getCookies();
+/*     Cookie[] cookies = request.getCookies();
     String saveMid = "";
     String check = "";
     for(int i=0; i<cookies.length; i++) {
@@ -12,7 +12,7 @@
         }
     }
     pageContext.setAttribute("saveMid", saveMid);
-    pageContext.setAttribute("check", check);
+    pageContext.setAttribute("check", check); */
 %>
 <!DOCTYPE html>
 <html>
@@ -55,6 +55,7 @@
 				success : function(res) {
 					if(res != "0") alert("새로운 비밀번호가 메일로 발송되었습니다\n메일함을 확인하세요");
 					else alert("등록하신 정보의 회원이 없습니다.");
+					location.reload();
 				},
 				error : function() {
 					alert("전송오류!");

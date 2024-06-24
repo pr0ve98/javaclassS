@@ -139,7 +139,7 @@
 		else {
     		document.getElementById("hidden-nickName-msg").style.display = "none";
 			$.ajax({
-				url : "${ctp}/MemberNickCheck.mem",
+				url : "${ctp}/member/memberNickCheck",
 				type : "get",
 				data : {nickName : nickName},
 				success : function(res) {
@@ -177,7 +177,7 @@
 <jsp:include page="/WEB-INF/views/include/slide2.jsp" />
 <p><br/></p>
 <div class="container">
-  <form name="myform" method="post" action="${ctp}/MemberUpdateOk.mem" class="was-validated">
+  <form name="myform" method="post" class="was-validated" enctype="multipart/form-data">
     <h2>회 원 정 보 수 정</h2>
     <br/>
     <div class="form-group">
@@ -233,21 +233,22 @@
         <div class="input-group-prepend">
           <span class="input-group-text">전화번호 :</span> &nbsp;&nbsp;
             <select name="tel1" class="custom-select">
-              <option value="010" ${tel1 == '010' ? 'selected' : ''}>010</option>
-              <option value="02" ${tel1 == '02' ? 'selected' : ''}>02</option>
-              <option value="031" ${tel1 == '031' ? 'selected' : ''}>031</option>
-              <option value="032" ${tel1 == '032' ? 'selected' : ''}>032</option>
-              <option value="041" ${tel1 == '041' ? 'selected' : ''}>041</option>
-              <option value="042" ${tel1 == '042' ? 'selected' : ''}>042</option>
-              <option value="043" ${tel1 == '043' ? 'selected' : ''}>043</option>
-              <option value="051" ${tel1 == '051' ? 'selected' : ''}>051</option>
-              <option value="052" ${tel1 == '052' ? 'selected' : ''}>052</option>
-              <option value="061" ${tel1 == '061' ? 'selected' : ''}>061</option>
-              <option value="062" ${tel1 == '062' ? 'selected' : ''}>062</option>
+            <c:set var="tel" value="${fn:split(vo.tel, '-')}"/>
+              <option value="010" ${tel[0] == '010' ? 'selected' : ''}>010</option>
+              <option value="02" ${tel[0] == '02' ? 'selected' : ''}>02</option>
+              <option value="031" ${tel[0] == '031' ? 'selected' : ''}>031</option>
+              <option value="032" ${tel[0] == '032' ? 'selected' : ''}>032</option>
+              <option value="041" ${tel[0] == '041' ? 'selected' : ''}>041</option>
+              <option value="042" ${tel[0] == '042' ? 'selected' : ''}>042</option>
+              <option value="043" ${tel[0] == '043' ? 'selected' : ''}>043</option>
+              <option value="051" ${tel[0] == '051' ? 'selected' : ''}>051</option>
+              <option value="052" ${tel[0] == '052' ? 'selected' : ''}>052</option>
+              <option value="061" ${tel[0] == '061' ? 'selected' : ''}>061</option>
+              <option value="062" ${tel[0] == '062' ? 'selected' : ''}>062</option>
             </select> - 
         </div>
-        <input type="text" name="tel2" value="${tel2}" size=4 maxlength=4 class="form-control"/> - 
-        <input type="text" name="tel3" value="${tel3}" size=4 maxlength=4 class="form-control"/>
+        <input type="text" name="tel2" value="${tel[1]}" size=4 maxlength=4 class="form-control"/> - 
+        <input type="text" name="tel3" value="${tel[2]}" size=4 maxlength=4 class="form-control"/>
       </div>
       <div id="hidden-tel-msg" class="error" style="display:none;">※전화번호 형식에 적합하지 않습니다!</div>
     </div>
@@ -255,16 +256,16 @@
       <label for="address">주소</label>
       <div class="input-group mb-1">
       <c:set var="address" value="${fn:split(vo.address, '/')}"/>
-        <input type="text" name="postcode" id="sample6_postcode" value="${postcode}" class="form-control">
+        <input type="text" name="postcode" id="sample6_postcode" value="${address[0]}" class="form-control">
         <div class="input-group-append">
           <input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기" class="btn btn-secondary">
         </div>
       </div>
-      <input type="text" name="roadAddress" id="sample6_address" size="50" value="${roadAddress}" class="form-control mb-1">
+      <input type="text" name="roadAddress" id="sample6_address" size="50" value="${address[1]}" class="form-control mb-1">
       <div class="input-group mb-1">
-        <input type="text" name="detailAddress" id="sample6_detailAddress" value="${detailAddress}" class="form-control"> &nbsp;&nbsp;
+        <input type="text" name="detailAddress" id="sample6_detailAddress" value="${address[2]}" class="form-control"> &nbsp;&nbsp;
         <div class="input-group-append">
-          <input type="text" name="extraAddress" id="sample6_extraAddress" value="${extraAddress}" class="form-control">
+          <input type="text" name="extraAddress" id="sample6_extraAddress" value="${address[3]}" class="form-control">
         </div>
       </div>
     </div>
@@ -292,7 +293,7 @@
 		취미: &nbsp;
 		<c:set var="varHobbys" value="${fn:split('등산/낚시/수영/독서/영화감상/바둑/축구/기타', '/')}"/>
 		<c:forEach var="tempHobby" items="${varHobbys}" varStatus="st">
-			<input type="checkbox" name="hobby" value="${tempHobby}" <c:if test="${fn:contains(hobby, tempHobby)}">checked</c:if> /> ${tempHobby}&nbsp;
+			<input type="checkbox" name="hobby" value="${tempHobby}" <c:if test="${fn:contains(vo.hobby, tempHobby)}">checked</c:if> /> ${tempHobby}&nbsp;
 		</c:forEach>
     </div>
     <div class="form-group">
@@ -303,22 +304,22 @@
       <div class="form-check-inline">
         <span class="input-group-text">정보공개</span>  &nbsp; &nbsp;
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="userInfor" value="공개" checked/>공개
+          <input type="radio" class="form-check-input" name="userInfor" value="공개" ${vo.userInfor == '공개' ? checked : '' }/>공개
         </label>
       </div>
       <div class="form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="userInfor" value="비공개"/>비공개
+          <input type="radio" class="form-check-input" name="userInfor" value="비공개" ${vo.userInfor == '비공개' ? checked : '' }/>비공개
         </label>
       </div>
     </div>
     <div  class="form-group">
-      회원 사진(파일용량:2MByte이내) : <img src="${ctp}/images/member/${vo.photo}" width="100px" />
+      회원 사진(파일용량:2MByte이내) : <img src="${ctp}/member/${vo.photo}" width="100px" />
       <input type="file" name="fName" id="file" class="form-control-file border"/>
     </div>
     <button type="button" class="btn btn-secondary" onclick="fCheck()">회원정보수정</button> &nbsp;
     <button type="button" class="btn btn-secondary" onclick="resetForm()">다시작성</button> &nbsp;
-    <button type="button" class="btn btn-secondary" onclick="location.href='MemberMain.mem';">돌아가기</button>
+    <button type="button" class="btn btn-secondary" onclick="location.href='${ctp}/member/memberPwdCheck/i';">돌아가기</button>
     
     <input type="hidden" name="email" />
     <input type="hidden" name="tel" />

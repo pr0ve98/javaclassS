@@ -24,10 +24,14 @@
     	// 아이디,닉네임,성명,이메일,홈페이지,전화번호,비밀번호 등등....
     	
     	// 검사를 끝내고 필요한 내역들을 변수에 담아 회원가입처리한다.
-/*     	let fName = document.getElementById("file").value;
-		let ext = fName.substring(fName.lastIndexOf(".")+1).toLowerCase();
-		let maxSize = 1024 * 1024 * 5;
-		let fileSize = document.getElementById("file").files[0].size; */
+     	let fName = document.getElementById("file").value;
+    	let ext;
+    	let fileSize;
+		let maxSize = 1024 * 1024 * 20;
+		if(fName != "") {
+			ext = fName.substring(fName.lastIndexOf(".")+1).toLowerCase();
+			fileSize = document.getElementById("file").files[0].size;
+		}
     	
     	let email1 = myform.email1.value.trim();
     	let email2 = myform.email2.value;
@@ -101,13 +105,13 @@
     		myform.homePage.value = "";
 			myform.homePage.focus();
     	}
-/*     	// 전송 전 파일관련사항 체크
-    	else if(ext != 'jpg' && ext != 'jpeg' && ext != 'png' && ext != 'gif'){
+     	// 전송 전 파일관련사항 체크
+    	else if(ext != 'jpg' && ext != 'jpeg' && ext != 'png' && ext != 'gif' && ext != null){
     		alert("이미지 파일만 업로드 가능합니다!");
     	}
     	else if(fileSize > maxSize){
-    		alert("업로드할 파일의 최대용량은 5MB입니다!");
-    	} */
+    		alert("업로드할 파일의 최대용량은 20MB입니다!");
+    	}
     	else if(idCheckSw == 0){
     		alert("아이디 중복체크를 해주세요!");
     		document.getElementById("midBtn").focus();
@@ -263,8 +267,8 @@
 <jsp:include page="/WEB-INF/views/include/slide2.jsp" />
 <p><br/></p>
 <div class="container">
-  <!-- <form name="myform" method="post" class="was-validated" enctype="multipart/form-data"> -->
-  <form name="myform" method="post" class="was-validated">
+  <form name="myform" method="post" class="was-validated" enctype="multipart/form-data">
+  <!-- <form name="myform" method="post" class="was-validated"> -->
     <h2>회 원 가 입</h2>
     <br/>
     <div class="form-group">

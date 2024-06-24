@@ -16,7 +16,7 @@
 		function memberPhotoChange() {
 			let fName = document.getElementById("file").value;
 			let ext = fName.substring(fName.lastIndexOf(".")+1).toLowerCase();
-			let maxSize = 1024 * 1024 * 10 // 기본단위는 Byte, 1024 * 1024 * 10 = 10MB 허용
+			let maxSize = 1024 * 1024 * 20 // 기본단위는 Byte, 1024 * 1024 * 10 = 20MB 허용
 			
 			if(fName.trim() == ""){
 				alert("업로드할 파일을 선택하세요");
@@ -25,7 +25,7 @@
 			
 			let fileSize = document.getElementById("file").files[0].size;
 			if(fileSize > maxSize){
-				alert("업로드할 파일의 최대크기는 10MB입니다");
+				alert("업로드할 파일의 최대크기는 20MB입니다");
 			}
 			else if(ext != 'jpg' && ext != 'png' &&ext != 'gif' &&ext != 'jpeg'){
 				alert("이미지 파일만 업로드해주세요");
@@ -36,7 +36,7 @@
 				formData.append("mid", '${sMid}');
 				
 				$.ajax({
-					url : "MemberPhotoChange.mem",
+					url : "${ctp}/member/memberPhotoChange",
 					type : "post",
 					data : formData,
 					processData: false,
@@ -88,7 +88,7 @@
 	<div class="row">
     <div class="col" style="width:420px">
 	<div style="width:460px">
-		<form name="chatForm">
+<%-- 		<form name="chatForm">
 			<label for="chat"><b>실시간 대화방</b></label>
 			<iframe src="${ctp}/include/memberMessage.jsp" width="100%" height="200px" class="border"></iframe>
 			<div class="input-group">
@@ -97,7 +97,12 @@
 					<input type="button" value="전송" onclick="chatInput()" class="btn btn-success"/>
 				</div>
 			</div>
-		</form>
+		</form> --%>
+		
+			<c:if test="${!empty sLogin}">
+				현재 임시비밀번호를 발급하여 메일로 전송처리 되어있습니다.<br/>
+				개인정보를 확인하시고, 비밀번호를 새로 변경해주세요.<br/>
+			</c:if>
 		</div>
 	</div>
 	<div class="col text-center">
@@ -129,7 +134,7 @@
 	  </div>
 	  </div>
 	<hr/>
-	<img src="${ctp}/images/member/${mVo.photo}" width="200px"/>
+	<img src="${ctp}/member/${mVo.photo}" width="200px"/>
 	<hr/>
 	<form name="myform" method="post" enctype="multipart/form-data">
 		<label for="file">회원이미지 변경</label>
@@ -140,7 +145,7 @@
 	</form>
 	<hr/>
 	<div>
-		<p>현재 <font color="blue"><b>${sNickName}</b></font>(<font color="red">${sStrLevel}</font>)님이 로그인 중입니다.</p>
+		<p>현재 <font color="blue"><b>${sNickName}</b></font>(<font color="red">${strLevel}</font>)님이 로그인 중입니다.</p>
 		<p>총 방문횟수 <b>${mVo.visitCnt}</b>회 / 오늘 방문횟수 <b>${mVo.todayCnt}</b>회</p>
 		<p>총 보유 포인트 <b>${mVo.point}</b>점<c:if test="${mVo.todayCnt > 5}"> / (방문포인트 일일 최대한도 초과)</c:if></p>
 	</div>
