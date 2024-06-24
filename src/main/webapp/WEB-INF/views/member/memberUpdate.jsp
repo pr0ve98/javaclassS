@@ -304,12 +304,12 @@
       <div class="form-check-inline">
         <span class="input-group-text">정보공개</span>  &nbsp; &nbsp;
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="userInfor" value="공개" ${vo.userInfor == '공개' ? checked : '' }/>공개
+          <input type="radio" class="form-check-input" name="userInfor" value="공개" ${vo.userInfor == '공개' ? 'checked' : '' }/>공개
         </label>
       </div>
       <div class="form-check-inline">
         <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="userInfor" value="비공개" ${vo.userInfor == '비공개' ? checked : '' }/>비공개
+          <input type="radio" class="form-check-input" name="userInfor" value="비공개" ${vo.userInfor == '비공개' ? 'checked' : '' }/>비공개
         </label>
       </div>
     </div>
