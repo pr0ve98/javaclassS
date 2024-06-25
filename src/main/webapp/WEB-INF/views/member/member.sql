@@ -2,7 +2,7 @@ show tables;
 
 create table member2 (
   idx       int not null auto_increment,/* 회원 고유번호 */
-  mid       varchar(30) not null,				/* 회원 아이디(중복불허) */
+  mid       varchar(20) not null,				/* 회원 아이디(중복불허) */
   pwd       varchar(100) not null,			/* 회원 비밀번호(SHA256 암호화 처리) */
   nickName  varchar(20) not null,				/* 회원 별명(중복불허/수정가능) */
   name		  varchar(20) not null,				/* 회원 성명 */

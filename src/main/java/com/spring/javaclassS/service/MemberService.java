@@ -28,4 +28,6 @@ public interface MemberService {
 
 	public int setMemberUpdate(MemberVO vo, MultipartFile fName, HttpServletRequest request);
 
+	public int setMemberDelete(String mid);
+
 }

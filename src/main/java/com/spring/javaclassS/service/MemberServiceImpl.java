@@ -45,7 +45,7 @@ public class MemberServiceImpl implements MemberService {
 		// 서버에 파일 올리기
 		else {
 			try {
-				javaclassProvide.wirteFile(fName, sFileName, "member");
+				javaclassProvide.writeFile(fName, sFileName, "member");
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -81,7 +81,7 @@ public class MemberServiceImpl implements MemberService {
 		
 		// 서버에 파일 올리기
 		try {
-			javaclassProvide.wirteFile(fName, sFileName, "member");
+			javaclassProvide.writeFile(fName, sFileName, "member");
 			if(!vo.getPhoto().equals("noimage.jpg")) {
 				String realPath = request.getSession().getServletContext().getRealPath("/resources/data/member/");
 				File fileName = new File(realPath + vo.getPhoto());
@@ -107,7 +107,7 @@ public class MemberServiceImpl implements MemberService {
 		String sFileName = vo.getMid() + "_" + uid.toString().substring(0,8) + "_" + oFileName;
 		if(!oFileName.equals("")) {
 			try {
-				javaclassProvide.wirteFile(fName, sFileName, "member");
+				javaclassProvide.writeFile(fName, sFileName, "member");
 				if(!vo.getPhoto().equals("noimage.jpg")) {
 					String realPath = request.getSession().getServletContext().getRealPath("/resources/data/member/");
 					File fileName = new File(realPath + vo.getPhoto());
@@ -119,5 +119,10 @@ public class MemberServiceImpl implements MemberService {
 			}
 		}
 		return memberDAO.setMemberUpdate(vo, sFileName, oFileName);
+	}
+
+	@Override
+	public int setMemberDelete(String mid) {
+		return memberDAO.setMemberDelete(mid);
 	}
 }

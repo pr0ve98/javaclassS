@@ -38,4 +38,7 @@
 	<update id="setMemberUpdate">
 		update member2 set nickName=#{vo.nickName},name=#{vo.name},email=#{vo.email},gender=#{vo.gender},birthday=#{vo.birthday},tel=#{vo.tel},address=#{vo.address},homePage=#{vo.homePage},job=#{vo.job},hobby=#{vo.hobby}<if test="oFileName != ''">,photo=#{photo}</if>,content=#{vo.content},userInfor=#{vo.userInfor} where mid=#{vo.mid};
 	</update>
+	<update id="setMemberDelete">
+		update member2 set userDel='OK' where mid=#{mid};
+	</update>
 </mapper>

@@ -291,4 +291,13 @@ public class MemberController {
 		}
 		else return "redirect:/message/memberUpdateNo";
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/memberDelete", method = RequestMethod.POST)
+	public String memberDeletePost(String mid) {
+		int res = memberService.setMemberDelete(mid);
+		if(res != 0) return "1";
+		else return "0";
+	}
+
 }

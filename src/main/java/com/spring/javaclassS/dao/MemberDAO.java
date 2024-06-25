@@ -26,4 +26,6 @@ public interface MemberDAO {
 
 	public int setMemberUpdate(@Param("vo") MemberVO vo, @Param("photo") String photo, @Param("oFileName") String oFileName);
 
+	public int setMemberDelete(@Param("mid") String mid);
+
 }

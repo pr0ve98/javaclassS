@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.javaclassS.dao.BoardDAO">
+	<select id="getBoardList" resultType="com.spring.javaclassS.vo.BoardVO">
+		select *,datediff(wDate, now()) as date_diff,
+		timestampdiff(hour,wDate,now()) as hour_diff 
+		from board2 order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	<select id="getBoardContent" resultType="com.spring.javaclassS.vo.BoardVO">
+		select * from board2 where idx=#{idx};
+	</select>
+	<select id="getTotRecCnt" resultType="int">
+		select count(*) from board2;
+	</select>
+	
+	<!-- <![CDATA[]]>	그대로 본다(태그로 인식 X)	<![CDATA[]>  -->
+	<select id="getPreNextSearch" resultType="com.spring.javaclassS.vo.BoardVO">
+		<if test="flag == 'preVo'">
+			select idx,title,nickName,wDate from board2 where <![CDATA[idx < #{idx}]]> order by idx desc limit 1;
+		</if>
+		<if test="flag == 'nextVo'">
+			select idx,title,nickName,wDate from board2 where <![CDATA[idx > #{idx}]]> order by idx limit 1;
+		</if>
+	</select>
+	
+	<insert id="setBoardInput">
+		insert into board2 values (default,#{vo.mid},#{vo.nickName},#{vo.title},#{vo.content},default,#{vo.hostIp},#{vo.openSw},default,default,default);
+	</insert>
+	
+	<update id="setReadNumPlus">
+		update board2 set readNum=readNum+1 where idx=#{idx};
+	</update>
+</mapper>

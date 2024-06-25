@@ -120,6 +120,26 @@ public class MessageController {
 			model.addAttribute("msg","정보 수정 실패~");
 			model.addAttribute("url", "/member/memberPwdCheck/i");
 		}
+		else if(msgFlag.equals("adminNo")) {
+			model.addAttribute("msg", "관리자만 접속하실수 있습니다.");
+			model.addAttribute("url", "/");
+		}
+		else if(msgFlag.equals("memberNo")) {
+			model.addAttribute("msg", "회원 로그인후 사용하세요");
+			model.addAttribute("url", "/member/memberLogin");
+		}
+		else if(msgFlag.equals("memberLevelNo")) {
+			model.addAttribute("msg", "회원 등급을 확인하세요");
+			model.addAttribute("url", "/member/memberMain");
+		}
+		else if(msgFlag.equals("boardInputOk")) {
+			model.addAttribute("msg", "게시글 등록 성공!");
+			model.addAttribute("url", "/board/boardList");
+		}
+		else if(msgFlag.equals("boardInputNo")) {
+			model.addAttribute("msg", "게시글 등록실패...");
+			model.addAttribute("url", "/board/boardInput");
+		}
 		
 
 		

@@ -1,13 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns="http://www.springframework.org/schema/mvc"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
 	<!-- Interceptor 설정(정의) -->
+	<beans:bean id="Level0Interceptor" class="com.spring.javaclassS.interceptor.Level0Interceptor" />
+	<beans:bean id="Level1Interceptor" class="com.spring.javaclassS.interceptor.Level1Interceptor" />
+	<beans:bean id="Level2Interceptor" class="com.spring.javaclassS.interceptor.Level2Interceptor" />
+	<beans:bean id="Level3Interceptor" class="com.spring.javaclassS.interceptor.Level3Interceptor" />
 	
+	<interceptors>
+		<interceptor> <!-- 준회원/비회원처리 -->
+			<mapping path="/member/**"/>
+			<mapping path="/board/boardList"/>
+			<exclude-mapping path="/member/memberLogin"/>
+			<exclude-mapping path="/member/memberJoin"/>
+			<exclude-mapping path="/member/memberNewPassword"/>
+			<exclude-mapping path="/member/memberIdCheck"/>
+			<exclude-mapping path="/member/memberNickCheck"/>
+			<exclude-mapping path="/member/memberLogout"/>
+			<beans:ref bean="Level3Interceptor"/>
+		</interceptor>
+		<interceptor> <!-- 정회원(준회원은 게시판 목록만 읽기가능, 기타 'board/study/pds/dbShop'의 기능은 정회원 이상만 가능) -->
+			<mapping path="/board/**"/>
+			<mapping path="/study/**"/>
+			<mapping path="/user/**"/>
+			<mapping path="/dbShop/**"/>
+			<mapping path="/pds/pdsList"/>
+			<mapping path="/pds/pdsDownload"/>
+			<mapping path="/member/memberList"/>
+			<exclude-mapping path="/board/boardList"/>
+			<beans:ref bean="Level2Interceptor" />
+		</interceptor>
+		<interceptor> <!-- 우수회원(자료실의 list와 download는 정회원까지 가능) -->
+			<mapping path="/pds/**"/>
+			<exclude-mapping path="/pds/pdsList"/>
+			<exclude-mapping path="/pds/pdsDownload"/>
+			<beans:ref bean="Level1Interceptor" />
+		</interceptor> 
+		<interceptor> <!-- 관리자 -->
+			<mapping path="/admin/**"/>
+			<beans:ref bean="Level0Interceptor" />
+		</interceptor>
+	</interceptors>
 	
 </beans:beans>
