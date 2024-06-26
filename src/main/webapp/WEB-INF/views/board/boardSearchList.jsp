@@ -23,21 +23,6 @@
 			$("#myModal #modalIdx").text(idx);
 		}
 	</script>
-	<style>
-		a:link {
-			color : black;
-		}
-		a:visited {
-		  color : black;
-		}
-		a:hover {
-		  color : black;
-		  text-decoration-line: none;
-		}
-		a:active {
-		  color : black;
-		}
-	</style>
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/include/nav.jsp" />
@@ -48,7 +33,7 @@
 		<tr>
 			<td colspan="2">
 				<h2 class="text-center">게 시 판 검 색 결 과</h2>
-				<div class="text-center">(<span style="color:skyblue;"><b>${searchTitle}</b></span>로 <span style="color:skyblue;"><b>${searchString}</b></span>를 검색한 결과 <span style="color:red;"><b>${totRecCnt}</b></span>건의 자료가 검색되었습니다.)</div>
+				<div class="text-center">(<span style="color:skyblue;"><b>${searchTitle}</b></span>로 <span style="color:skyblue;"><b>${searchString}</b></span>를 검색한 결과 <span style="color:red;"><b>${searchCount}</b></span>건의 자료가 검색되었습니다.)</div>
 			</td>
 		</tr>
 		<tr>
@@ -70,13 +55,13 @@
 			<th>작성날짜</th>
 			<th>조회수(좋아요)</th>
 		</tr>
+		<c:set var="curScrStartNo" value="${pageVo.curScrStartNo}"/>
 		<c:forEach var="vo" items="${vos}" varStatus="st">
-		<c:set var="curScrStartNo" value="${curScrStartNo}"/>
 			<c:if test="${vo.openSw == 'OK' || sLevel == 0 || sNickName == vo.nickName}">
 				<tr>
 					<td>${curScrStartNo}</td>
 					<td class="text-left">
-						<a href="BoardContent.bo?idx=${vo.idx}&pag=${pag}&pageSize=${pageSize}&flag=search&search=${search}&searchString=${searchString}">${vo.title}</a> 
+						<a href="boardContent?idx=${vo.idx}&pag=${pageVo.pag}&pageSize=${pageVo.pageSize}&flag=search&search=${search}&searchString=${searchString}">${vo.title}</a> 
 						<c:if test="${vo.hour_diff < 24}"><img src="${ctp}/images/new.gif" alt="새글" /></c:if>
 					</td>
 					<td>
@@ -87,7 +72,7 @@
 					</td>
 					<td>
 						<!-- 1일(24시간) 이내는 올린 날짜를 시간만 표시, 이후는 날짜와 시간을 표시 : 2024-05-14 10:43:52 -->
-						${vo.date_diff == 0 ? fn:substring(vo.wDate, 11, 16) : fn:substring(vo.wDate, 0, 10)}
+						${vo.date_diff == 0 ? fn:substring(vo.WDate, 11, 16) : fn:substring(vo.WDate, 0, 10)}
 					</td>
 					<td>${vo.readNum}(${vo.good})</td>
 				</tr>
@@ -100,21 +85,21 @@
 	<!-- 블록페이지 시작 -->
 	<div class="text-center">
 	  <ul class="pagination justify-content-center">
-		  <c:if test="${pag > 1}"><li class="page-item"><a class="page-link text-secondary" href="${ctp}/BoardSearchList.bo?search=${search}&searchString=${searchString}&pag=1&pageSize=${pageSize}">첫페이지</a></li></c:if>
-		  <c:if test="${curBlock > 0}"><li class="page-item"><a class="page-link text-secondary" href="${ctp}/BoardSearchList.bo?search=${search}&searchString=${searchString}&pag=${(curBlock-1)*blockSize + 1}&pageSize=${pageSize}">이전블록</a></li></c:if>
-		  <c:forEach var="i" begin="${(curBlock*blockSize)+1}" end="${(curBlock*blockSize) + blockSize}" varStatus="st">
-		    <c:if test="${i <= totPage && i == pag}"><li class="page-item active"><a class="page-link bg-secondary border-secondary" href="${ctp}/BoardSearchList.bo?search=${search}&searchString=${searchString}&pag=${i}&pageSize=${pageSize}">${i}</a></li></c:if>
-		    <c:if test="${i <= totPage && i != pag}"><li class="page-item"><a class="page-link text-secondary" href="${ctp}/BoardSearchList.bo?search=${search}&searchString=${searchString}&pag=${i}&pageSize=${pageSize}">${i}</a></li></c:if>
+		  <c:if test="${pageVo.pag > 1}"><li class="page-item"><a class="page-link text-secondary" href="boardSearchList.bo?search=${pageVo.search}&searchString=${pageVo.searchString}&pag=1&pageSize=${pageVo.pageSize}">첫페이지</a></li></c:if>
+		  <c:if test="${pageVo.curBlock > 0}"><li class="page-item"><a class="page-link text-secondary" href="boardSearchList.bo?search=${pageVo.search}&searchString=${pageVo.searchString}&pag=${(pageVo.curBlock-1)*pageVo.blockSize + 1}&pageSize=${pageVo.pageSize}">이전블록</a></li></c:if>
+		  <c:forEach var="i" begin="${(pageVo.curBlock*pageVo.blockSize)+1}" end="${(pageVo.curBlock*pageVo.blockSize) + pageVo.blockSize}" varStatus="st">
+		    <c:if test="${i <= pageVo.totPage && i == pageVo.pag}"><li class="page-item active"><a class="page-link bg-secondary border-secondary" href="boardSearchList.bo?search=${pageVo.search}&searchString=${pageVo.searchString}&pag=${i}&pageSize=${pageVo.pageSize}">${i}</a></li></c:if>
+		    <c:if test="${i <= pageVo.totPage && i != pageVo.pag}"><li class="page-item"><a class="page-link text-secondary" href="boardSearchList.bo?search=${pageVo.search}&searchString=${pageVo.searchString}&pag=${i}&pageSize=${pageVo.pageSize}">${i}</a></li></c:if>
 		  </c:forEach>
-		  <c:if test="${curBlock < lastBlock}"><li class="page-item"><a class="page-link text-secondary" href="${ctp}/BoardSearchList.bo?search=${search}&searchString=${searchString}&pag=${(curBlock+1)*blockSize+1}&pageSize=${pageSize}">다음블록</a></li></c:if>
-		  <c:if test="${pag < totPage}"><li class="page-item"><a class="page-link text-secondary" href="${ctp}/BoardSearchList.bo?search=${search}&searchString=${searchString}&pag=${totPage}&pageSize=${pageSize}">마지막페이지</a></li></c:if>
+		  <c:if test="${pageVo.curBlock < pageVo.lastBlock}"><li class="page-item"><a class="page-link text-secondary" href="boardSearchList.bo?search=${pageVo.search}&searchString=${pageVo.searchString}&pag=${(pageVo.curBlock+1)*pageVo.blockSize+1}&pageSize=${pageVo.pageSize}">다음블록</a></li></c:if>
+		  <c:if test="${pageVo.pag < pageVo.totPage}"><li class="page-item"><a class="page-link text-secondary" href="boardSearchList.bo?search=${pageVo.search}&searchString=${pageVo.searchString}&pag=${pageVo.totPage}&pageSize=${pageVo.pageSize}">마지막페이지</a></li></c:if>
 	  </ul>
 	</div>
 	<!-- 블록페이지 끝 -->
 	<br/>
 	<!-- 검색기 시작 -->
 	<div class="container text-center">
-		<form name="searchForm" method="post" action="BoardSearchList.bo">
+		<form name="searchForm" method="post" action="boardSearchList">
 			<b>검색: </b>
 			<select name="search" id="search">
 				<option value="title">제목</option>
@@ -123,7 +108,7 @@
 			</select>
 			<input type="text" name="searchString" id="searchString" placeholder="검색어를 입력하세요" required />
 			<input type="submit" value="검색" class="btn btn-secondary btn-sm"/>
-			<input type="button" onclick="location.href='BoardList.bo';" value="전체보기" class="btn btn-primary btn-sm"/>
+			<input type="button" onclick="location.href='boardList';" value="전체보기" class="btn btn-primary btn-sm"/>
 		</form>
 	</div>
 	<!-- 검색기 끝 -->

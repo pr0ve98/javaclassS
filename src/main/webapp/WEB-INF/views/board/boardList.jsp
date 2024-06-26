@@ -34,7 +34,7 @@
 			<td colspan="2"><h2 class="text-center">게 시 판 리 스 트</h2></td>
 		</tr>
 		<tr>
-			<td><c:if test="${sLevel != 1}"><a href="${ctp}/board/boardInput" class="btn btn-success btn-sm">글쓰기</a></c:if></td>
+			<td><c:if test="${sLevel != 3}"><a href="${ctp}/board/boardInput" class="btn btn-success btn-sm">글쓰기</a></c:if></td>
 			<td class="text-right">
 				<select name="pageSize" id="pageSize" onchange="pageSizeCheck()">
 					<option value="5" ${pageVO.pageSize==5 ? "selected" : ""}>5개씩 보기</option>
@@ -61,7 +61,7 @@
 					<td class="text-left">
 						<a href="${ctp}/board/boardContent?idx=${vo.idx}&pag=${pageVO.pag}&pageSize=${pageVO.pageSize}">${vo.title}</a> 
 						<c:if test="${vo.hour_diff < 24}"><img src="${ctp}/images/new.gif" alt="새글" /></c:if>
-						<c:if test="${vo.replyCnt != 0}"><font color="red">[${vo.replyCnt}]</font></c:if>
+						<c:if test="${vo.replyCnt != 0}">[<font color="red">${vo.replyCnt}</font>]</c:if>
 					</td>
 					<td>
 						${vo.nickName}
@@ -98,7 +98,7 @@
 	<br/>
 	<!-- 검색기 시작 -->
 	<div class="container text-center">
-		<form name="searchForm" method="post" action="BoardSearchList.bo">
+		<form name="searchForm" method="post" action="boardSearch">
 			<b>검색: </b>
 			<select name="search" id="search">
 				<option value="title">제목</option>
@@ -107,6 +107,8 @@
 			</select>
 			<input type="text" name="searchString" id="searchString" placeholder="검색어를 입력하세요" required />
 			<input type="submit" value="검색" class="btn btn-secondary btn-sm"/>
+			<input type="hidden" name="pag" value="${pageVo.pag}" />
+			<input type="hidden" name="pageSize" value="${pageVo.pageSize}" />
 		</form>
 	</div>
 	<!-- 검색기 끝 -->

@@ -15,7 +15,7 @@
 		
 		function boardDelete() {
 			let ans = confirm("현재 게시글을 삭제하시겠습니까?");
-			if(ans) location.href="BoardDelete.bo?idx=${vo.idx}";
+			if(ans) location.href="boardDelete?idx=${vo.idx}&pag=${pag}&pageSize=${pageSize}";
 		}
 		
 		// 좋아요 처리(중복허용)
@@ -131,11 +131,12 @@
 			});
 		}
 		
-		// 댓글 달기
+		// 원본글 댓글 달기
 		function replyCheck() {
 			let content = $("#content").val();
 			if(content.trim() == "") {
 				alert("댓글을 입력하세요");
+				$("#content").focus();
 				return false;
 			}
 
@@ -148,7 +149,7 @@
 			}
 			
 			$.ajax({
-				url : "BoardReplyInput.bo",
+				url : "${ctp}/board/boardReplyInput",
 				type : "post",
 				data : query,
 				success : function(res) {
@@ -182,6 +183,66 @@
 				},
 				error : function() {
 					alert("오류남ㅋㅋ");
+				}
+			});
+		}
+		
+		// 처음에는 대댓글 닫기 버튼은 안보이게 한다
+		$(function() {
+			$(".replyCloseBtn").hide();
+		});
+		// 대댓글 입력버튼 클릭시 입력박스 보여주기
+		function replyShow(idx) {
+			$(".replyShowBtn").show();
+			$(".replyCloseBtn").hide();
+			$(".replyDemo").hide();
+			$("#replyShowBtn"+idx).hide();
+			$("#replyCloseBtn"+idx).show();
+			$("#replyDemo"+idx).show();
+		}
+		
+		// 대댓글 박스 감추기
+		function replyClose(idx) {
+			$(".replyShowBtn").show();
+			$(".replyCloseBtn").hide();
+			$(".replyDemo").hide();
+			$("#replyShowBtn"+idx).show();
+			$("#replyCloseBtn"+idx).hide();
+			$("#replyDemo"+idx).hide();
+		}
+		
+		// 대댓글(부모댓글의 답변글)
+		function replyCheckRe(idx, re_step, re_order) {
+			let content = $("#contentRe"+idx).val();
+			if(content.trim()=="") {
+				alert("답글을 입력하세요");
+				$("#contentRe"+idx).focus();
+				return false;
+			}
+			
+			let query = {
+				boardIdx : ${vo.idx},
+				re_step : re_step,
+				re_order : re_order,
+				mid : '${sMid}',
+				nickName : '${sNickName}',
+				hostIp : '${pageContext.request.remoteAddr}',
+				content : content
+			}
+			
+			$.ajax({
+				url : '${ctp}/board/boardReplyInputRe',
+				type : 'post',
+				data : query,
+				success : function(res) {
+					if(res != "0") {
+						alert("답글이 입력되었습니다!");
+						location.reload();
+					}
+					else alert("답글 입력 실패!");
+				},
+				error : function() {
+					alert("전송오류!");
 				}
 			});
 		}
@@ -224,7 +285,7 @@
 				<div class="row">
 					<div class="col">
 						<c:if test="${empty flag}"><input type="button" value="돌아가기" onclick="location.href='${ctp}/board/boardList?pag=${pag}&pageSize=${pageSize}';" class="btn btn-warning"/></c:if>
-						<c:if test="${!empty flag}"><input type="button" value="돌아가기" onclick="location.href='${ctp}/board/boardSearchList?search=${search}&searchString=${searchString}&pag=${param.pag}&pageSize=${param.pageSize}';" class="btn btn-warning"/></c:if>
+						<c:if test="${!empty flag}"><input type="button" value="돌아가기" onclick="location.href='${ctp}/board/boardSearch?search=${search}&searchString=${searchString}&pag=${pag}&pageSize=${pageSize}';" class="btn btn-warning"/></c:if>
 					</div>
 					<c:if test="${sNickName == vo.nickName || sLevel == 0}">
 						<div class="col text-right">
@@ -250,10 +311,14 @@
 			<th>내용</th>
 			<th>작성시간</th>
 			<th>작성아이피</th>
+			<th>답글</th>
 		</tr>
 		<c:forEach var="replyVo" items="${replyVos}" varStatus="st">
 			<tr>
-				<td>
+				<td class="text-left">
+					<c:if test="${replyVo.re_step >= 1}">
+						<c:forEach var="i" begin="1" end="${replyVo.re_step}">&nbsp;&nbsp;</c:forEach> └─
+					</c:if>
 					${replyVo.nickName}
 					<c:if test="${sMid == replyVo.mid || sLevel == 0}">
 						<a href="javascript:replayDelete(${replyVo.idx})">❌</a>
@@ -262,9 +327,32 @@
 				<td>${fn:replace(replyVo.content, newLine, "<br/>")}</td>
 				<td>${fn:substring(replyVo.WDate, 0, 16)}</td>
 				<td>${replyVo.hostIp}</td>
+				<td>
+					<a href="javascript:replyShow(${replyVo.idx})" id="replyShowBtn${replyVo.idx}" class="badge badge-success replyShowBtn">답글</a>
+					<a href="javascript:replyClose(${replyVo.idx})" id="replyCloseBtn${replyVo.idx}" class="badge badge-warning replyCloseBtn">닫기</a>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" class="m-0 p-0">
+					<div id="replyDemo${replyVo.idx}" class="replyDemo" style="display:none">
+						<table class="table table-center">
+							<tr>
+								<td style="width:85%" class="text-left">
+									@${replyVo.nickName}
+									<textarea rows="4" name="contentRe" id="contentRe${replyVo.idx}" class="form-control contentRe"></textarea>
+								</td>
+								<td style="width:15%">
+									<br/>
+									<p>작성자: ${sNickName}</p>
+									<input type="button" value="답글달기" onclick="replyCheckRe(${replyVo.idx}, ${replyVo.re_step}, ${replyVo.re_order})" class="btn btn-secondary btn-sm">
+								</td>							
+							</tr>
+						</table>
+					</div>
+				</td>
 			</tr>
 		</c:forEach>
-		<tr><td colspan="4" class="p-0 m-0"></td></tr>
+		<tr><td colspan="5" class="p-0 m-0"></td></tr>
 	</table>
 	<!-- 댓글 입력창 -->
 	<form name="replyForm">

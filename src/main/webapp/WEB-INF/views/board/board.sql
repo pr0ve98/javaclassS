@@ -24,6 +24,8 @@ insert into board2 values (default, 'admin', '관리자', '게시판 서비스�
 create table boardReply2 (
 	idx int not null auto_increment,/* 댓글 고유번호 */
 	boardIdx int not null,			/* 원본글(부모글)의 고유번호 - 외래키 */
+	re_step int not null,			/* 레벨(re_step)에 따른 들여쓰기(계층번호): 부모댓글의 re_step은 0이다. 대댓글의 경우는 부모re_step+1로 처리 */
+	re_order int not null,			/* 댓글의 순서 결정 부모댓글을 1번, 대댓글의 경우는 부모댓글보다 큰 대댓글은 re_order+1 처리하고 자신은 부모댓글의 re_order보다 +1 처리한다  */
 	mid varchar(20) not null,		/* 댓글 쓴 사람 아이디 */
 	nickName varchar(20) not null,	/* 댓글 쓴 사람 닉네임 */
 	wDate datetime default now(),	/* 댓글 쓴 날짜시간 */

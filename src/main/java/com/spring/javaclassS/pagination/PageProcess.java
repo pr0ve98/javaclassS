@@ -23,7 +23,11 @@ public class PageProcess {
 		String search = "";
 		
 		if(section.equals("board")) {
-			totRecCnt = boardDAO.getTotRecCnt();
+			if(part.equals("")) totRecCnt = boardDAO.getTotRecCnt();
+			else {
+				search= part;
+				totRecCnt = boardDAO.totRecCntSearch(search, searchString);
+			}
 		}
 		else if(section.equals("member")) {
 			//totRecCnt = memberDAO.getTotRecCnt();
