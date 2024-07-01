@@ -21,7 +21,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>memberLogin.jsp</title>
 	<jsp:include page="/WEB-INF/views/include/bs4.jsp" />
-	<style type="text/css">
+	<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+	<style>
 		.main{
 			width:40%;
 			margin: 0 auto;
@@ -62,6 +63,26 @@
 				}
 			});
 		}
+		
+		// 카카오 로그인(자바스크립트 앱키 등록)
+		window.Kakao.init("8feb139a33abe9bdb09b890a08740296");
+		
+		function kakaoLogin() {
+			window.Kakao.Auth.login({
+				scope: 'profile_nickname, account_email',
+				success : function(autoObj) {
+					console.log(Kakao.Auth.getAccessToken(), "정상 토큰 발급됨");
+					window.Kakao.API.request({
+						url : '/v2/user/me',
+						success : function(res) {
+							const kakao_account = res.kakao_account;
+							console.log(kakao_account);
+							location.href = "${ctp}/member/kakaoLogin?nickName="+kakao_account.profile.nickname+"&email="+kakao_account.email+"&accessToken="+Kakao.Auth.getAccessToken();
+						}
+					});
+				}
+			});
+		}
 	</script>
 </head>
 <body>
@@ -78,6 +99,7 @@
 				<input type="submit" value="로그인" class="btn btn-primary" />
 				<input type="button" value="회원가입" onclick="location.href='${ctp}/member/memberJoin';" class="btn btn-info" />
 			</p>
+			<p><a href="javascript:kakaoLogin()"><img alt="카카오로그인" src="${ctp}/images/kakao_login_medium_wide.png"></a></p>
 			<table class="table table-bordered p-0">
 				<tr>
 					<td class="text-cetner">
