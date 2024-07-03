@@ -684,7 +684,7 @@ public class StudyController {
 			//ArrayList<String> priceVos = new ArrayList<String>();
 			
 			for(int i=0; i<page; i++) {
-				selects = document.selectXpath("//*[@id=\"mflick\"]/div/div/div/div/strong/a");
+				selects = document.selectXpath("//*[@id=\"mflick\"]/div/div/div["+(i+1)+"]/div/strong/a");
 				for(Element select : selects) {
 					titleVos.add("<a href='https://search.naver.com/search.naver?"+select.tagName("a").attribute("href").toString().substring(select.tagName("a").attribute("href").toString().indexOf("?")+1)+"' target='_blank'>"+select.text()+"</a>");
 				}
