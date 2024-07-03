@@ -3,7 +3,9 @@ package com.spring.javaclassS.service;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -333,6 +335,28 @@ public class StudyServiceImpl implements StudyService {
 		} catch (IOException e) {e.printStackTrace();}
 			
 		return res;
+	}
+
+	@Override
+	public Map<String, Integer> analyzer(String content) {
+		int wordFrequenciesToReturn = 10; // 빈도수
+		int minWordLength = 2; // 최소 단어글자수
+		
+		Map<String, Integer> frequencyMap = new HashMap<String, Integer>();
+		
+		String[] words = content.split("\\s+"); // 스페이스바 최소 1개이상
+		
+		for(String word : words) {
+			if(word.length() >= minWordLength) {
+				word = word.toLowerCase();
+				frequencyMap.put(word, frequencyMap.getOrDefault(word, 0) + 1);
+			}
+		}
+		
+	   return frequencyMap.entrySet().stream()
+		          .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+		          .limit(wordFrequenciesToReturn)
+		          .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
 	}
 
 }
