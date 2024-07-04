@@ -1048,14 +1048,14 @@ public class StudyController {
 	        
 	        try {
 	        	driver.get(String.format(STEAM_SEARCH_URL, vo.getGameTitle()));
-            	try { Thread.sleep(7000);} catch (InterruptedException e) {}
+            	try { Thread.sleep(13000);} catch (InterruptedException e) {}
 	            WebElement link = driver.findElement(By.cssSelector("a[href^='https://store.steampowered.com']"));
 	            if (link != null) {
 	            	steamGame(driver, link.getAttribute("href"), voList.getGameIdx());
 	            }
 	            else {
 		            driver.get(String.format(STOVE_SEARCH_URL, vo.getGameTitle()));
-		            try { Thread.sleep(7000);} catch (InterruptedException e) {}
+		            try { Thread.sleep(13000);} catch (InterruptedException e) {}
 		            link = driver.findElement(By.cssSelector("a[href^='https://store.onstove.com']"));
 		            if (link != null) {
 		                stoveGame(driver, link.getAttribute("href"), voList.getGameIdx());
@@ -1074,12 +1074,10 @@ public class StudyController {
 	
     private void steamGame(WebDriver driver, String url, int gameIdx) {
         driver.get(url);
-        try { Thread.sleep(8000);} catch (InterruptedException e) {}
         String gameSubTitle = driver.findElement(By.cssSelector("div.apphub_AppName")).getText();
         String gameInfo = driver.findElement(By.cssSelector("div.game_description_snippet")).getText();
         String gameImg = driver.findElement(By.cssSelector("img.game_header_image_full")).getAttribute("src");
         String steamscore = "사용자 평가 없음";
-        String steamPage = url;
         String metascore = "0";
         try {
         	steamscore = driver.findElement(By.cssSelector("span.game_review_summary")).getText();
@@ -1092,7 +1090,6 @@ public class StudyController {
         vo.setGameInfo(gameInfo);
         vo.setGameImg(gameImg);
         vo.setSteamscore(steamscore);
-        vo.setSteamPage(steamPage);
         if(!metascore.equals("0")) vo.setMetascore(Integer.parseInt(metascore));
         vo.setDeveloper(developer);
         
@@ -1101,7 +1098,6 @@ public class StudyController {
     
     private void stoveGame(WebDriver driver, String url, int gameIdx) {
     	driver.get(url);
-    	try { Thread.sleep(8000);} catch (InterruptedException e) {}
     	String gameSubTitle = driver.findElement(By.xpath("//*[@id=\"645adaa720577c7c9ae0d807\"]/div[2]/div[1]/div[1]/div[2]/h2")).getText();
     	gameSubTitle = gameSubTitle.substring(gameSubTitle.indexOf("("), gameSubTitle.lastIndexOf(")"));
     	String gameInfo = driver.findElement(By.xpath("//*[@id=\"645adaa720577c7c9ae0d807\"]/div[2]/div[2]/div[2]/div/div[2]/div/p")).getText();
