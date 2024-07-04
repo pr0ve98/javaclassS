@@ -36,6 +36,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -51,7 +52,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.google.common.util.concurrent.Service;
 import com.kennycason.kumo.CollisionMode;
 import com.kennycason.kumo.WordCloud;
 import com.kennycason.kumo.WordFrequency;
@@ -1037,25 +1037,40 @@ public class StudyController {
 		 String STEAM_SEARCH_URL = "https://www.google.com/search?q=%s+site:store.steampowered.com";
 		 String STOVE_SEARCH_URL = "https://www.google.com/search?q=%s+site:store.onstove.com";
 		 
+        // 디버깅 포트로 Chrome 실행
+        String chromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+        String remoteDebuggingPort = "9222";
+        String userDataDir = "C:\\chrometemp";
+        String command = chromePath + " --remote-debugging-port=" + remoteDebuggingPort + " --user-data-dir=" + userDataDir;
+
+        try {
+            Runtime.getRuntime().exec(command);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        String realPath = request.getSession().getServletContext().getRealPath("/resources/crawling/");
+        System.setProperty("webdriver.chrome.driver", realPath + "chromedriver.exe");
+	 
+        ChromeOptions options = new ChromeOptions();
+        options.setExperimentalOption("debuggerAddress", "127.0.0.1:9222");
+        
+        WebDriver driver = new ChromeDriver(options);
+	        
 		 ArrayList<GameVO> vos = studyService.getGameList();
 		 for(GameVO voList : vos) {
 			 GameVO vo = studyService.getGameIdx(voList.getGameIdx());
-			 
-	        String realPath = request.getSession().getServletContext().getRealPath("/resources/crawling/");
-	        System.setProperty("webdriver.chrome.driver", realPath + "chromedriver.exe");
 	
-	        WebDriver driver = new ChromeDriver();
-	        
 	        try {
 	        	driver.get(String.format(STEAM_SEARCH_URL, vo.getGameTitle()));
-            	try { Thread.sleep(13000);} catch (InterruptedException e) {}
+            	try { Thread.sleep(5000);} catch (InterruptedException e) {}
 	            WebElement link = driver.findElement(By.cssSelector("a[href^='https://store.steampowered.com']"));
-	            if (link != null) {
+	            try {
 	            	steamGame(driver, link.getAttribute("href"), voList.getGameIdx());
 	            }
-	            else {
+	            catch (Exception ee){
 		            driver.get(String.format(STOVE_SEARCH_URL, vo.getGameTitle()));
-		            try { Thread.sleep(13000);} catch (InterruptedException e) {}
+		            try { Thread.sleep(5000);} catch (InterruptedException e) {}
 		            link = driver.findElement(By.cssSelector("a[href^='https://store.onstove.com']"));
 		            if (link != null) {
 		                stoveGame(driver, link.getAttribute("href"), voList.getGameIdx());
@@ -1064,16 +1079,15 @@ public class StudyController {
 	
 	        } catch (Exception e) {
 	            e.printStackTrace();
-	        } finally {
-	            driver.close();
 	        }
-		}
-        
+		 }
+	    driver.close();
         return "study/crawling/selenium";
 	}
 	
     private void steamGame(WebDriver driver, String url, int gameIdx) {
         driver.get(url);
+        try { Thread.sleep(5000);} catch (InterruptedException e) {}
         String gameSubTitle = driver.findElement(By.cssSelector("div.apphub_AppName")).getText();
         String gameInfo = driver.findElement(By.cssSelector("div.game_description_snippet")).getText();
         String gameImg = driver.findElement(By.cssSelector("img.game_header_image_full")).getAttribute("src");
@@ -1098,8 +1112,9 @@ public class StudyController {
     
     private void stoveGame(WebDriver driver, String url, int gameIdx) {
     	driver.get(url);
+    	try { Thread.sleep(5000);} catch (InterruptedException e) {}
     	String gameSubTitle = driver.findElement(By.xpath("//*[@id=\"645adaa720577c7c9ae0d807\"]/div[2]/div[1]/div[1]/div[2]/h2")).getText();
-    	gameSubTitle = gameSubTitle.substring(gameSubTitle.indexOf("("), gameSubTitle.lastIndexOf(")"));
+    	gameSubTitle = gameSubTitle.substring(gameSubTitle.indexOf("(")+1, gameSubTitle.lastIndexOf(")"));
     	String gameInfo = driver.findElement(By.xpath("//*[@id=\"645adaa720577c7c9ae0d807\"]/div[2]/div[2]/div[2]/div/div[2]/div/p")).getText();
     	String gameImg = driver.findElement(By.cssSelector("img.h-full.w-full.object-cover")).getAttribute("src");
     	String developer = driver.findElement(By.xpath("//*[@id=\"645adaa720577c7c9ae0d807\"]/div[2]/div[2]/div[2]/div/div[2]/dl/dd[2]/a")).getText();
