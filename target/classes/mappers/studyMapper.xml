@@ -20,18 +20,41 @@
 		select sum(murder+robbery+theft+violence) as allCntCri, sum(murder) as allCntMur, sum(murder) as allCntMur,
 		sum(robbery) as allCntRob, sum(theft) as allCntThe, sum(violence) as allCntVio from crime where year = #{year};
 	</select>
+	<select id="getKakaoAddressSearch" resultType="com.spring.javaclassS.vo.KakaoAddressVO">
+		select * from kakaoAddress where address=#{address};
+	</select>
+	<select id="getKakaoAddressList" resultType="com.spring.javaclassS.vo.KakaoAddressVO">
+		select * from kakaoAddress order by address;
+	</select>
+	<select id="getGameIdx" resultType="com.spring.javaclassS.vo.GameVO">
+		select * from itGame where gameIdx=#{gameIdx};
+	</select>
+	<select id="getGameList" resultType="com.spring.javaclassS.vo.GameVO">
+		select * from itGame;
+	</select>
 	
-	
+	<update id="setGameUpdate">
+		update itGame set gameSubTitle=#{vo.gameSubTitle},gameInfo=#{vo.gameInfo},gameImg=#{vo.gameImg},steamscore=#{vo.steamscore},steamPage=#{vo.steamPage},<if test="vo.metascore != null">metascore=#{vo.metascore},</if>developer=#{vo.developer} where gameIdx=#{gameIdx};
+	</update>
 	
 	
 	<insert id="setSaveCrimeData">
 		insert into crime values (default, #{vo.year}, #{vo.police}, #{vo.murder}, #{vo.robbery}, #{vo.theft}, #{vo.violence});
+	</insert>
+	<insert id="setGame">
+		insert IGNORE into itGame (gameIdx,gameTitle,jangre,platform,showDate) values (default, #{vo.item1}, #{vo.item2}, #{vo.item3}, #{vo.item4});
+	</insert>
+	<insert id="setKakaoAddressInput">
+		insert into kakaoAddress values (#{vo.address}, #{vo.latitude}, #{vo.longitude});
 	</insert>
 	
 	
 	
 	<delete id="setdeleteCrimeDate">
 		delete from crime where year = #{year};
+	</delete>
+	<delete id="setKakaoAddressDelete">
+		delete from kakaoAddress where address=#{address};
 	</delete>
 	
 	

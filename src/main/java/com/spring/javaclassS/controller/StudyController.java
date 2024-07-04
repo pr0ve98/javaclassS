@@ -24,6 +24,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -45,10 +46,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.google.common.util.concurrent.Service;
 import com.kennycason.kumo.CollisionMode;
 import com.kennycason.kumo.WordCloud;
 import com.kennycason.kumo.WordFrequency;
@@ -63,6 +66,8 @@ import com.spring.javaclassS.common.SecurityUtil;
 import com.spring.javaclassS.service.StudyService;
 import com.spring.javaclassS.vo.CrawlingVO;
 import com.spring.javaclassS.vo.CrimeVO;
+import com.spring.javaclassS.vo.GameVO;
+import com.spring.javaclassS.vo.KakaoAddressVO;
 import com.spring.javaclassS.vo.MailVO;
 import com.spring.javaclassS.vo.UserVO;
 
@@ -738,7 +743,7 @@ public class StudyController {
 	// 크롤링연습 처리(selenium) - 네이버 게임 목록 조회하기
 	@ResponseBody
 	@RequestMapping(value = "/crawling/naverGameSearch", method = RequestMethod.POST)
-	public List<CrawlingVO> naverGameSearchPost(HttpServletRequest request, int page) {
+	public List<CrawlingVO> naverGameSearchPost(HttpServletRequest request, int startpage, int endpage) {
 	    List<CrawlingVO> vos = new ArrayList<CrawlingVO>();
 	    try {
 	        String realPath = request.getSession().getServletContext().getRealPath("/resources/crawling/");
@@ -749,7 +754,7 @@ public class StudyController {
 
 	        WebElement btnMore = null;
 
-	        for(int i=0; i<page; i++) {
+	        for(int i=startpage; i<=endpage; i++) {
 	            // 페이지마다 새로고침된 HTML을 가져와서 Jsoup으로 파싱
 	            Document document = Jsoup.parse(driver.getPageSource());
 
@@ -757,9 +762,7 @@ public class StudyController {
 	            Elements jangres = document.selectXpath("//*[@id=\"mflick\"]/div/div/div[" + (i+1) + "]/div/dl/dd[1]");
 	            Elements platforms = document.selectXpath("//*[@id=\"mflick\"]/div/div/div[" + (i+1) + "]/div/dl/dd[2]");
 	            Elements chulsiils = document.selectXpath("//*[@id=\"mflick\"]/div/div/div[" + (i+1) + "]/div/dl/dd[3]");
-	            Elements thumbnails = document.selectXpath("//*[@id=\"mflick\"]/div/div/div[" + (i+1) + "]/div/div/a");
-	            Elements prices = (i >= 7) ? document.selectXpath("//*[@id=\"mflick\"]/div/div/div[" + (i+1) + "]/div/dl/dd[4]") : null;
-
+	            //Elements thumbnails = document.selectXpath("//*[@id=\"mflick\"]/div/div/div[" + (i+1) + "]/div/div/a/img");
 	            for (int j = 0; j < titles.size(); j++) {
 	                String platformText = platforms.get(j).text();
 	                if (platformText.indexOf("iOS") != -1 || platformText.indexOf("Android") != -1) {
@@ -771,20 +774,15 @@ public class StudyController {
 	                vo.setItem2(jangres.get(j).text());
 	                vo.setItem3(platforms.get(j).text());
 	                vo.setItem4(chulsiils.get(j).text());
-	                if (i >= 7 && prices != null && j < prices.size()) {
-	                    vo.setItem5(prices.get(j).text());
-	                } else {
-	                    vo.setItem5("");  // 가격 정보가 없는 경우 빈 문자열로 처리
-	                }
-	                vo.setItem6(thumbnails.get(j).outerHtml());
-	                vos.add(vo);
+	                //vo.setItem5(thumbnails.get(j).outerHtml());
+	                studyService.setGame(vo);
 	            }
 
 	            // 페이지 넘기기 버튼 클릭
-	            if (i < page - 1) {
+	            if (i < endpage - 1) {
 	                btnMore = driver.findElement(By.xpath("//*[@id=\"main_pack\"]/section[5]/div[2]/div/div/div[4]/div/a[2]"));
 	                btnMore.click();
-	                try { Thread.sleep(2000);} catch (InterruptedException e) {}
+	                if(i >= startpage) try { Thread.sleep(2000);} catch (InterruptedException e) {}
 	            }
 	        }
 	        driver.close();
@@ -941,4 +939,179 @@ public class StudyController {
 	private InputStream getInputStream(String path) throws IOException {
 		return new FileInputStream(new File(path));
 	}
+	
+	@RequestMapping(value = "/random/randomForm", method = RequestMethod.GET)
+	public String randomFormGet() {
+		return "study/random/randomForm";
+	}
+	
+	// randomNumeric: 숫자 랜덤 처리
+	@ResponseBody
+	@RequestMapping(value = "/random/randomNumeric", method = RequestMethod.POST)
+	public String randomNumericPost() {
+		//(int)(Math.random()*(최대값-최소값+1))+최소값
+		return ((int) (Math.random()*(99999999-10000000+1)) + 10000000)+"";
+	}
+	
+	// randomUUID: 숫자와 문자를 소문자형식으로 랜덤 처리(16진수 32자리)
+	@ResponseBody
+	@RequestMapping(value = "/random/randomUUID", method = RequestMethod.POST)
+	public String randomUUIDPost() {
+		return (UUID.randomUUID())+"";
+	}
+	
+	// randomAlphaNumeric: 숫자와 문자를 대/소문자 섞어 랜덤 처리(일반 영숫자 nn자리)
+	@ResponseBody
+	@RequestMapping(value = "/random/randomAlphaNumeric", method = RequestMethod.POST)
+	public String randomAlphaNumericPost() {
+		//String res = RandomStringUtils.randomAlphanumeric(64);
+		return RandomStringUtils.randomAlphanumeric(64);
+	}
+	
+	// 카카오 맵 화면보기
+	@RequestMapping(value = "/kakao/kakaomap", method = RequestMethod.GET)
+	public String kakaomapGet() {
+		return "study/kakao/kakaomap";
+	}
+	
+	// 카카오 맵 마커표시/저장 폼
+	@RequestMapping(value = "/kakao/kakaoEx1", method = RequestMethod.GET)
+	public String kakaoEx1Get() {
+		return "study/kakao/kakaoEx1";
+	}
+	
+	// 카카오 맵 마커표시/저장 처리
+	@ResponseBody
+	@RequestMapping(value = "/kakao/kakaoEx1", method = RequestMethod.POST)
+	public String kakaoEx1Post(KakaoAddressVO vo) {
+		KakaoAddressVO searchVO = studyService.getKakaoAddressSearch(vo.getAddress());
+		if(searchVO != null) return "0";
+		
+		studyService.setKakaoAddressInput(vo);
+		
+		return "1";
+	}
+	
+	// 카카오 맵 MyDB에 저장된 지명검색
+	@RequestMapping(value = "/kakao/kakaoEx2", method = RequestMethod.GET)
+	public String kakaoEx2Get(Model model, 
+			@RequestParam(name="address", defaultValue = "", required = false) String address) {
+		KakaoAddressVO vo = new KakaoAddressVO();
+
+		List<KakaoAddressVO> addressVos = studyService.getKakaoAddressList();
+		
+		if(address.equals("")) {
+			vo.setAddress("청주그린컴퓨터");
+			vo.setLatitude(36.63513327240579);
+			vo.setLongitude(127.45953253595172);
+		}
+		else {
+			vo = studyService.getKakaoAddressSearch(address);
+		}
+		
+		model.addAttribute("vo", vo);
+		model.addAttribute("addressVos", addressVos);
+		return "study/kakao/kakaoEx2";
+	}
+	
+	// 카카오 맵 MyDB에 저장된 위치 삭제
+	@ResponseBody
+	@RequestMapping(value = "/kakao/kakaoAddressDelete", method = RequestMethod.POST)
+	public String kakaoAddressDeletePost(String address) {
+		return studyService.setKakaoAddressDelete(address)+"";
+	}
+	
+	// 카카오맵 : KakaoDB에 저장된 키워드검색후 MyDB에 저장하기
+	@RequestMapping(value = "/kakao/kakaoEx3", method = RequestMethod.GET)
+	public String kakaoEx3Get(Model model,
+			@RequestParam(name="address", defaultValue = "", required = false) String address
+		) {
+		model.addAttribute("address", address);
+		return "study/kakao/kakaoEx3";
+	}
+	
+	
+	// 스팀 & 스토브 크롤링
+	@RequestMapping(value = "/crawling/steamstove", method = RequestMethod.GET)
+	public String steamstove(HttpServletRequest request) {
+		 String STEAM_SEARCH_URL = "https://www.google.com/search?q=%s+site:store.steampowered.com";
+		 String STOVE_SEARCH_URL = "https://www.google.com/search?q=%s+site:store.onstove.com";
+		 
+		 ArrayList<GameVO> vos = studyService.getGameList();
+		 for(GameVO voList : vos) {
+			 GameVO vo = studyService.getGameIdx(voList.getGameIdx());
+			 
+	        String realPath = request.getSession().getServletContext().getRealPath("/resources/crawling/");
+	        System.setProperty("webdriver.chrome.driver", realPath + "chromedriver.exe");
+	
+	        WebDriver driver = new ChromeDriver();
+	        
+	        try {
+	        	driver.get(String.format(STEAM_SEARCH_URL, vo.getGameTitle()));
+            	try { Thread.sleep(10000);} catch (InterruptedException e) {}
+	            WebElement link = driver.findElement(By.cssSelector("a[href^='https://store.steampowered.com']"));
+	            if (link != null) {
+	            	steamGame(driver, link.getAttribute("href"), voList.getGameIdx());
+	            }
+	            else {
+		            driver.get(String.format(STOVE_SEARCH_URL, vo.getGameTitle()));
+		            try { Thread.sleep(10000);} catch (InterruptedException e) {}
+		            link = driver.findElement(By.cssSelector("a[href^='https://store.onstove.com']"));
+		            if (link != null) {
+		                stoveGame(driver, link.getAttribute("href"), voList.getGameIdx());
+		            }
+	            }
+	
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            driver.close();
+	        }
+		}
+        
+        return "study/crawling/selenium";
+	}
+	
+    private void steamGame(WebDriver driver, String url, int gameIdx) {
+        driver.get(url);
+        String gameSubTitle = driver.findElement(By.cssSelector("div.apphub_AppName")).getText();
+        String gameInfo = driver.findElement(By.cssSelector("div.game_description_snippet")).getText();
+        String gameImg = driver.findElement(By.cssSelector("img.game_header_image_full")).getAttribute("src");
+        String steamscore = "사용자 평가 없음";
+        String steamPage = url;
+        String metascore = "0";
+        try {
+        	steamscore = driver.findElement(By.cssSelector("span.game_review_summary")).getText();
+            metascore = driver.findElement(By.cssSelector("div#game_area_metascore.score")).getText();
+        } catch (Exception e) {}
+        String developer = driver.findElement(By.cssSelector("div#developers_list")).getText();
+        
+        GameVO vo = new GameVO();
+        vo.setGameSubTitle(gameSubTitle);
+        vo.setGameInfo(gameInfo);
+        vo.setGameImg(gameImg);
+        vo.setSteamscore(steamscore);
+        vo.setSteamPage(steamPage);
+        if(!metascore.equals("0")) vo.setMetascore(Integer.parseInt(metascore));
+        vo.setDeveloper(developer);
+        
+        studyService.setGameUpdate(vo, gameIdx);
+    }
+    
+    private void stoveGame(WebDriver driver, String url, int gameIdx) {
+    	driver.get(url);
+    	String gameSubTitle = driver.findElement(By.xpath("//*[@id=\"645adaa720577c7c9ae0d807\"]/div[2]/div[1]/div[1]/div[2]/h2")).getText();
+    	gameSubTitle = gameSubTitle.substring(gameSubTitle.indexOf("("), gameSubTitle.lastIndexOf(")"));
+    	String gameInfo = driver.findElement(By.xpath("//*[@id=\"645adaa720577c7c9ae0d807\"]/div[2]/div[2]/div[2]/div/div[2]/div/p")).getText();
+    	String gameImg = driver.findElement(By.cssSelector("img.h-full.w-full.object-cover")).getAttribute("src");
+    	String developer = driver.findElement(By.xpath("//*[@id=\"645adaa720577c7c9ae0d807\"]/div[2]/div[2]/div[2]/div/div[2]/dl/dd[2]/a")).getText();
+    	
+    	GameVO vo = new GameVO();
+    	vo.setGameSubTitle(gameSubTitle);
+    	vo.setGameInfo(gameInfo);
+    	vo.setGameImg(gameImg);
+    	vo.setDeveloper(developer);
+    	
+    	studyService.setGameUpdate(vo, gameIdx);
+    }
 }

@@ -80,13 +80,15 @@
 	// 네이버 게임 목록 지정페이지까지 크롤링
     function crawling3() {
     	$("#spinnerIcon3").show();
-    	let page = $("#page").val();
+    	let startpage = $("#startpage").val();
+    	let endpage = $("#endpage").val();
     	
     	$.ajax({
 			url   : "${ctp}/study/crawling/naverGameSearch",
 			type  : "post",
 			data  : {
-				page : page
+				startpage : startpage,
+				endpage : endpage
 			},
     		success:function(vos) {
     			if(vos != "") {
@@ -153,7 +155,8 @@
 	  <form name="gameform">
 	    <div class="input-group mb-3">
 		    <div class="input-group-text">마지막 페이지(1~마지막지정페이지)</div>
-		    <input type="number" name="page" id="page" value="2" class="form-control"/>
+		    <input type="number" name="startpage" id="startpage" value="1" class="form-control"/>
+		    <input type="number" name="endpage" id="endpage" value="1768" class="form-control"/>
 		    <div class="input-group-append mr-5"><input type="button" value="크롤링3" onclick="crawling3()" class="btn btn-success"/></div>
 		    <div class="input-group-append">
 		      <span id="spinnerIcon3" style="display:none">
@@ -167,6 +170,8 @@
 	  <hr/>
 	<hr/>
 	<div id="demo"></div>
+	<img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2358720/header.jpg?t=1718690162" width="100"/>
+	<button onclick="location.href='${ctp}/study/crawling/steamstove'">구글검색</button>
 </div>
 <p><br/></p>
 <jsp:include page="/WEB-INF/views/include/footer.jsp" />
