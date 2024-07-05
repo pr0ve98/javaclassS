@@ -61,4 +61,8 @@ public interface StudyService {
 
 	public ArrayList<GameVO> getGameList();
 
+	public String fileCsvToMysql(MultipartFile fName);
+
+	public String setCsvTableDelete(String csvTable);
+
 }

@@ -9,6 +9,7 @@ import com.spring.javaclassS.vo.CrawlingVO;
 import com.spring.javaclassS.vo.CrimeVO;
 import com.spring.javaclassS.vo.GameVO;
 import com.spring.javaclassS.vo.KakaoAddressVO;
+import com.spring.javaclassS.vo.PetCafeVO;
 import com.spring.javaclassS.vo.UserVO;
 
 public interface StudyDAO {
@@ -44,5 +45,7 @@ public interface StudyDAO {
 	public void setGameUpdate(@Param("vo") GameVO vo, @Param("gameIdx") int gameIdx);
 
 	public ArrayList<GameVO> getGameList();
+
+	public void setPetCafe(@Param("vo") PetCafeVO vo);
 
 }
