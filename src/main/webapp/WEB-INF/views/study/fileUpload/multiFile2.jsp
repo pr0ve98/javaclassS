@@ -85,7 +85,7 @@
 	<h2>멀티(그림)파일 업로드 연습</h2>
 	<form name="myform" method="post" enctype="multipart/form-data">
 		<a href="javascript:imageUpload()" class="myBtn">이미지불러오기</a>
-		<input type="file" name="fName" id="inputImgs" multiple class="form-control-file border" accept=".jpg,.gif,.png,.jpeg,.zip,.pptx,.ppt,.hwp,.txt" />
+		<span style="display:none"><input type="file" name="fName" id="inputImgs" multiple class="form-control-file border" accept=".jpg,.gif,.png,.jpeg,.zip,.pptx,.ppt,.hwp,.txt" /></span>
 		<p>
 			<input type="button" value="파일업로드" onclick="fCheck()" class="btn btn-success" />
 			<input type="reset" value="다시선택" class="btn btn-warning" />

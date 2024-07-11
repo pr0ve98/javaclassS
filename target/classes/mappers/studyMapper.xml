@@ -32,6 +32,23 @@
 	<select id="getGameList" resultType="com.spring.javaclassS.vo.GameVO">
 		select * from itGame;
 	</select>
+	<select id="getQrCodeSearch" resultType="com.spring.javaclassS.vo.QrCodeVO">
+		select * from qrCode where qrCodeName = #{qrCode};
+	</select>
+	<select id="getRecentlyVisitCount" resultType="com.spring.javaclassS.vo.ChartVO">
+		<if test="i == 1">
+			select substring(visitDate, 1, 10) as visitDate, visitCount from visit order by visitDate desc limit 7;
+		</if>
+		<if test="i == 2">
+			select mid as visitDate, visitCnt as visitCount from member2 order by visitCnt desc limit 7;
+		</if>
+	</select>
+	<select id="getTranscationList" resultType="com.spring.javaclassS.vo.TransactionVO">
+		select * from user order by idx desc;
+	</select>
+	<select id="getTranscationList2" resultType="com.spring.javaclassS.vo.TransactionVO">
+		select * from user2 order by mid desc;
+	</select>
 	
 	<update id="setGameUpdate">
 		update itGame set gameSubTitle=#{vo.gameSubTitle},gameInfo=#{vo.gameInfo},gameImg=#{vo.gameImg},steamscore=#{vo.steamscore},steamPage=#{vo.steamPage},<if test="vo.metascore != null">metascore=#{vo.metascore},</if>developer=#{vo.developer} where gameIdx=#{gameIdx};
@@ -47,6 +64,22 @@
 	<insert id="setKakaoAddressInput">
 		insert into kakaoAddress values (#{vo.address}, #{vo.latitude}, #{vo.longitude});
 	</insert>
+	<insert id="setQrCodeCreate">
+	  insert into qrCode values (default,#{vo.mid},#{vo.name},#{vo.email},#{vo.movieName},#{vo.movieDate},#{vo.movieTime},#{vo.movieAdult},#{vo.movieChild},#{vo.publishDate},#{vo.qrCodeName});
+	</insert>
+	<insert id="setTransactionUserInput">
+	  insert into user values(default,#{vo.mid},#{vo.name},#{vo.age},#{vo.address});
+	</insert>
+	<insert id="setTransactionUser1Input">
+	  insert into user values(default,#{vo.mid},#{vo.name},#{vo.age},#{vo.address});
+	</insert>
+	<insert id="setTransactionUser2Input">
+	  insert into user2 values(#{vo.mid},#{vo.job});
+	</insert>
+	<insert id="setTransactionUserTotalInput">
+		insert into user values (default,#{vo.mid},#{vo.name},#{vo.age},#{vo.address});
+	  	insert into user2 values (#{vo.mid},#{vo.job});
+	</insert>
 	
 	
 	
@@ -56,6 +89,8 @@
 	<delete id="setKakaoAddressDelete">
 		delete from kakaoAddress where address=#{address};
 	</delete>
-	
+	<delete id="setCsvTableDelete">
+	  delete from ${csvTable};
+	</delete>
 	
 </mapper>

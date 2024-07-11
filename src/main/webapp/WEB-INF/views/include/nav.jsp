@@ -73,13 +73,15 @@
 			        <a href="${ctp}/study/random/randomForm" class="w3-bar-item w3-button">랜덤알파뉴메릭</a>
 			        <a href="${ctp}/study/kakao/kakaomap" class="w3-bar-item w3-button">카카오맵</a>
 			        <a href="${ctp}/study/weather/weatherForm" class="w3-bar-item w3-button">날씨API</a>
-			        <a href="${ctp}/study/captcha/captcha" class="w3-bar-item w3-button">캡챠연습</a>
-			        <a href="${ctp}/study/password/password" class="w3-bar-item w3-button">큐알코드</a>
-			        <a href="${ctp}/study/mail/mailForm" class="w3-bar-item w3-button">웹 차트</a>
-			        <a href="${ctp}/study/fileUpload/fileUpload" class="w3-bar-item w3-button">트랜잭션</a>
-			        <a href="${ctp}/study/crawling/jsoup" class="w3-bar-item w3-button">스케줄러</a>
-			        <a href="${ctp}/study/crawling/selenium" class="w3-bar-item w3-button">크롤링(selenium)</a>
-			        <a href="${ctp}/study/wordcloud/wordcloudForm" class="w3-bar-item w3-button">WordCloud</a>
+			        <a href="${ctp}/study/captcha/captchaForm" class="w3-bar-item w3-button">캡차연습</a>
+			        <a href="${ctp}/study/qrCode/qrCodeForm" class="w3-bar-item w3-button">QR Code</a>
+			        <a href="${ctp}/study/thumbnail/thumbnailForm" class="w3-bar-item w3-button">썸네일 연습</a>
+			        <a href="${ctp}/study/chart/chartForm" class="w3-bar-item w3-button">웹 차트1</a>
+			        <a href="${ctp}/study/chart2/chart2Form" class="w3-bar-item w3-button">웹 차트2</a>
+			        <a href="${ctp}/study/validator/validatorForm" class="w3-bar-item w3-button">Validator</a>
+			        <a href="${ctp}/study/transaction/transactionForm" class="w3-bar-item w3-button">트랜잭션</a>
+			        <a href="#" class="w3-bar-item w3-button">스케줄러</a>
+			        <a href="${ctp}/study/csv/csvForm" class="w3-bar-item w3-button">CSV를MySQL로</a>
 			      </div>
 			    </div>
 		    </c:if>
