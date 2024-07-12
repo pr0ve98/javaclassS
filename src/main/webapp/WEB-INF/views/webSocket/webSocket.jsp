@@ -25,13 +25,13 @@
 		  // 웹 소켓
 		  let ws;
 		
-		  
+		  // 연결 버튼 클릭
 		  $('#btnConnect').click(function() {
 		  	
 	     	if ($('#user').val().trim() != '') {
 	  	   	ws = new WebSocket(url);
 	  	   			
-	  	   	
+	  	   	// 소켓 이벤트 매핑처리(연결되면 onopen 메소드 수행처리)
 	  	   	ws.onopen = function (evt) {
 	  	   		console.log($('#user').val(), '서버 연결 성공');
 	  	   		print($('#user').val(), '입장했습니다.');
@@ -48,32 +48,31 @@
 		  			$('#msg').focus();
 		  		};
 	        
-		  		
-	  			ws.onmessage = function (evt) {		
-		  			let index = evt.data.indexOf("#", 2);	
-		  			let no = evt.data.substring(0, 1);		
-		  			let user = evt.data.substring(2, index);  
+		  		// 서버에 다녀온 후 getBasicRemote().sendText()에서 가져온 메시지 처리
+	  			ws.onmessage = function (evt) {		// 서버에 넘어온 값이 '2#유저명:메시지
+		  			let index = evt.data.indexOf("#", 2);	// 메세지와 색상코드가 있는지 찾고있다
+		  			let no = evt.data.substring(0, 1);		// 접속자가 1(처음접속자) 2(기존접속자) 3(종료접속자)
+		  			let user = evt.data.substring(2, index);	// 로그인 사용자의 유저명을 가져옴  
 		  			
-		  			
-		  			if(index == -1) user = evt.data.substring(evt.data.indexOf("#")+1, evt.data.indexOf(":"));	
+		  			if(index == -1) user = evt.data.substring(evt.data.indexOf("#")+1, evt.data.indexOf(":"));	// 색상코드 없이 바로 넘어온 경우
 		  			let txt = evt.data.substring(evt.data.indexOf(":")+1);			  			
 		  	   				
-		  			if (no == '1') {	
+		  			if (no == '1') {	// 최초 접속자는 print2() 메소드 호출
 		  				print2(user);
-		  			} else if (no == '2') {	
+		  			} else if (no == '2') {	// 기존 접속자들은 채팅중이기에 print()에 유저명, 메시지 보냄
 		  				if (txt != '') print(user, txt);
-		  			} else if (no == '3') {	
+		  			} else if (no == '3') {	// 종료 사용자는 print3() 메소드 호출
 		  				print3(user);
 		  			}
-		  			$('#list').scrollTop($('#list').prop('scrollHeight'));	
+		  			$('#list').scrollTop($('#list').prop('scrollHeight'));	// 스크롤바를 가장 아래쪽으로 내린다
 		  		};
 	  	   	
-		  		
+		  		// 웹소켓 종료
 		  		ws.onclose = function (evt) {
 		  			console.log('소켓이 닫힙니다.');
 		  		};
 	
-		  		
+		  		// 웹소켓 에러
 		  		ws.onerror = function (evt) {
 		  			console.log(evt.data);
 		  		};
@@ -83,7 +82,7 @@
 		  	}
 		  });
 		
-		  
+		  // 로그인 사용자가 메세지 전송시 처리(유저명, 메세지)
 		  function print(user, txt) {
 		  	let temp = '';
 		  	
