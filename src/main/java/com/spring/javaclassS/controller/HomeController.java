@@ -94,4 +94,10 @@ public class HomeController {
 		downFile.delete();
 	}
 	
+	// 채팅창 띄우기
+	@RequestMapping(value = "/webSocket/webSocket", method = RequestMethod.GET)
+	public String webSocketGet() {
+    return "webSocket/webSocket";
+	}
+	
 }
